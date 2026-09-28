@@ -1,0 +1,18 @@
+/node_modules
+/.next/
+/out/
+/build
+/coverage
+.DS_Store
+*.pem
+npm-debug.log*
+.env
+.env*.local
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+# локальная dev-база и выгрузки сторонних баз (не коммитить!)
+/.data
+/data/lordokami*.json
+/public/q-images
+/public/uploads

@@ -1,0 +1,1295 @@
+{
+ "format": "dgt-pwa/questions@1",
+ "questions": [
+  {
+   "source": "manual",
+   "source_ref": "seed-001",
+   "rights_status": "own",
+   "topic": "velocidad",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En una vía urbana con un único carril por sentido de circulación, la velocidad máxima genérica es de:",
+     "a": "20 km/h",
+     "b": "30 km/h",
+     "c": "50 km/h",
+     "explanation": "En vías urbanas con un único carril por sentido la velocidad máxima es de 30 km/h. Con dos o más carriles por sentido es de 50 km/h, y en vías de plataforma única (calzada y acera al mismo nivel) es de 20 km/h.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "On an urban road with a single lane in each direction, the general maximum speed is:",
+     "a": "20 km/h",
+     "b": "30 km/h",
+     "c": "50 km/h",
+     "explanation": "On urban roads with one lane per direction the maximum speed is 30 km/h. With two or more lanes per direction it is 50 km/h, and on single-platform streets (roadway and pavement at the same level) it is 20 km/h.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "На городской дороге с одной полосой в каждом направлении общее ограничение скорости составляет:",
+     "a": "20 км/ч",
+     "b": "30 км/ч",
+     "c": "50 км/ч",
+     "explanation": "На городских дорогах с одной полосой в каждом направлении максимальная скорость — 30 км/ч. При двух и более полосах в каждом направлении — 50 км/ч, а на улицах с единой платформой (проезжая часть и тротуар на одном уровне) — 20 км/ч.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Քաղաքային փողոցում, որտեղ երթևեկության յուրաքանչյուր ուղղությամբ կա միայն մեկ գոտի, արագության ընդհանուր սահմանաչափը՝",
+     "a": "20 կմ/ժ",
+     "b": "30 կմ/ժ",
+     "c": "50 կմ/ժ",
+     "explanation": "Քաղաքային փողոցներում, որտեղ յուրաքանչյուր ուղղությամբ մեկ գոտի է, առավելագույն արագությունը 30 կմ/ժ է։ Յուրաքանչյուր ուղղությամբ երկու և ավելի գոտիների դեպքում՝ 50 կմ/ժ, իսկ միասնական հարթակով փողոցներում (երթևեկելի մասը և մայթը նույն մակարդակի վրա են)՝ 20 կմ/ժ։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-002",
+   "rights_status": "own",
+   "topic": "velocidad",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En una calle de plataforma única (calzada y acera al mismo nivel), la velocidad máxima es de:",
+     "a": "20 km/h",
+     "b": "10 km/h",
+     "c": "30 km/h",
+     "explanation": "En las vías con plataforma única de calzada y acera la velocidad máxima genérica es de 20 km/h, porque los peatones comparten el espacio con los vehículos.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "On a single-platform street (roadway and pavement at the same level), the maximum speed is:",
+     "a": "20 km/h",
+     "b": "10 km/h",
+     "c": "30 km/h",
+     "explanation": "On streets with a single platform for roadway and pavement the general maximum speed is 20 km/h, because pedestrians share the space with vehicles.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "На улице с единой платформой (проезжая часть и тротуар на одном уровне) максимальная скорость составляет:",
+     "a": "20 км/ч",
+     "b": "10 км/ч",
+     "c": "30 км/ч",
+     "explanation": "На улицах с единой платформой для проезжей части и тротуара общее ограничение — 20 км/ч, так как пешеходы делят пространство с транспортом.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Միասնական հարթակով փողոցում (երթևեկելի մասը և մայթը նույն մակարդակի վրա են) առավելագույն արագությունը՝",
+     "a": "20 կմ/ժ",
+     "b": "10 կմ/ժ",
+     "c": "30 կմ/ժ",
+     "explanation": "Երթևեկելի մասի և մայթի միասնական հարթակ ունեցող փողոցներում ընդհանուր առավելագույն արագությունը 20 կմ/ժ է, քանի որ հետիոտները տարածությունը կիսում են տրանսպորտային միջոցների հետ։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-003",
+   "rights_status": "own",
+   "topic": "velocidad",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "¿Cuál es la velocidad máxima genérica de un turismo en autopistas y autovías?",
+     "a": "120 km/h",
+     "b": "100 km/h",
+     "c": "110 km/h",
+     "explanation": "En autopistas y autovías la velocidad máxima genérica para turismos es de 120 km/h, siempre que la señalización no indique un límite inferior.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "What is the general maximum speed of a car on motorways and dual carriageways?",
+     "a": "120 km/h",
+     "b": "100 km/h",
+     "c": "110 km/h",
+     "explanation": "On motorways and dual carriageways the general maximum speed for cars is 120 km/h, unless signs show a lower limit.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Какова общая максимальная скорость легкового автомобиля на автопистах и автовиях?",
+     "a": "120 км/ч",
+     "b": "100 км/ч",
+     "c": "110 км/ч",
+     "explanation": "На автопистах и автовиях общее ограничение для легковых автомобилей — 120 км/ч, если знаки не указывают меньший предел.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Ո՞րն է թեթև մեքենայի ընդհանուր առավելագույն արագությունը ավտոմայրուղիներում և երկու գոտի ունեցող արագընթաց ճանապարհներում։",
+     "a": "120 կմ/ժ",
+     "b": "100 կմ/ժ",
+     "c": "110 կմ/ժ",
+     "explanation": "Ավտոմայրուղիներում և արագընթաց ճանապարհներում թեթև մեքենաների ընդհանուր առավելագույն արագությունը 120 կմ/ժ է, եթե նշանները ավելի ցածր սահմանաչափ չեն սահմանում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-004",
+   "rights_status": "own",
+   "topic": "alcohol",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "La tasa máxima de alcohol en aire espirado permitida a un conductor novel (menos de dos años de permiso) es de:",
+     "a": "0,15 mg/l",
+     "b": "0,25 mg/l",
+     "c": "0,50 mg/l",
+     "explanation": "Los conductores noveles (menos de dos años de permiso) y los profesionales no pueden superar 0,15 mg/l de alcohol en aire espirado (0,3 g/l en sangre).",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The maximum breath alcohol level allowed for a novice driver (less than two years of licence) is:",
+     "a": "0.15 mg/l",
+     "b": "0.25 mg/l",
+     "c": "0.50 mg/l",
+     "explanation": "Novice drivers (under two years of licence) and professional drivers may not exceed 0.15 mg/l of alcohol in exhaled air (0.3 g/l in blood).",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Максимально допустимая концентрация алкоголя в выдыхаемом воздухе для начинающего водителя (стаж менее двух лет) составляет:",
+     "a": "0,15 мг/л",
+     "b": "0,25 мг/л",
+     "c": "0,50 мг/л",
+     "explanation": "Начинающие водители (стаж менее двух лет) и профессиональные водители не могут превышать 0,15 мг/л алкоголя в выдыхаемом воздухе (0,3 г/л в крови).",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Սկսնակ վարորդի (վարորդական իրավունքի ստաժը երկու տարուց պակաս) համար արտաշնչվող օդում ալկոհոլի առավելագույն թույլատրելի մակարդակը՝",
+     "a": "0,15 մգ/լ",
+     "b": "0,25 մգ/լ",
+     "c": "0,50 մգ/լ",
+     "explanation": "Սկսնակ վարորդները (ստաժը երկու տարուց պակաս) և մասնագիտական վարորդները չպետք է գերազանցեն արտաշնչվող օդում 0,15 մգ/լ ալկոհոլը (արյան մեջ՝ 0,3 գ/լ)։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-005",
+   "rights_status": "own",
+   "topic": "alcohol",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "La tasa máxima de alcohol en aire espirado permitida a un conductor general (ni novel ni profesional) es de:",
+     "a": "0,15 mg/l",
+     "b": "0,50 mg/l",
+     "c": "0,25 mg/l",
+     "explanation": "Para el resto de conductores el límite es de 0,25 mg/l de alcohol en aire espirado (0,5 g/l en sangre). Superarlo es infracción; con tasas muy altas puede ser delito.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The maximum breath alcohol level allowed for an ordinary driver (neither novice nor professional) is:",
+     "a": "0.15 mg/l",
+     "b": "0.50 mg/l",
+     "c": "0.25 mg/l",
+     "explanation": "For all other drivers the limit is 0.25 mg/l of alcohol in exhaled air (0.5 g/l in blood). Exceeding it is an offence, and very high levels can be a crime.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Максимально допустимая концентрация алкоголя в выдыхаемом воздухе для обычного водителя (не начинающего и не профессионала) составляет:",
+     "a": "0,15 мг/л",
+     "b": "0,50 мг/л",
+     "c": "0,25 мг/л",
+     "explanation": "Для остальных водителей предел — 0,25 мг/л алкоголя в выдыхаемом воздухе (0,5 г/л в крови). Превышение — нарушение, а при очень высоких значениях возможна уголовная ответственность.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Սովորական վարորդի (ոչ սկսնակ և ոչ մասնագիտական) համար արտաշնչվող օդում ալկոհոլի առավելագույն թույլատրելի մակարդակը՝",
+     "a": "0,15 մգ/լ",
+     "b": "0,50 մգ/լ",
+     "c": "0,25 մգ/լ",
+     "explanation": "Մյուս վարորդների համար սահմանաչափը արտաշնչվող օդում 0,25 մգ/լ է (արյան մեջ՝ 0,5 գ/լ)։ Դրա գերազանցումը իրավախախտում է, իսկ շատ բարձր արժեքների դեպքում՝ նաև հանցագործություն։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-006",
+   "rights_status": "own",
+   "topic": "seguridad",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "El uso del cinturón de seguridad es obligatorio:",
+     "a": "Tanto en vías urbanas como interurbanas, para el conductor y los ocupantes",
+     "b": "Solo en vías interurbanas",
+     "c": "Solo para el conductor",
+     "explanation": "El cinturón es obligatorio en todas las vías, urbanas e interurbanas, para el conductor y para todos los ocupantes cuyas plazas dispongan de él, salvo excepciones previstas.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "Wearing a seat belt is mandatory:",
+     "a": "On both urban and interurban roads, for the driver and all occupants",
+     "b": "Only on interurban roads",
+     "c": "Only for the driver",
+     "explanation": "The seat belt is mandatory on all roads, urban and interurban, for the driver and for every occupant whose seat has one, except in the cases the rules provide for.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Использование ремня безопасности обязательно:",
+     "a": "И в городе, и за городом — для водителя и всех пассажиров",
+     "b": "Только на междугородних дорогах",
+     "c": "Только для водителя",
+     "explanation": "Ремень обязателен на всех дорогах, городских и междугородних, для водителя и для всех пассажиров, чьи места им оборудованы, за исключением случаев, предусмотренных правилами.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Ամրագոտու օգտագործումը պարտադիր է՝",
+     "a": "Թե՛ քաղաքային, թե՛ միջքաղաքային ճանապարհներին՝ վարորդի և բոլոր ուղևորների համար",
+     "b": "Միայն միջքաղաքային ճանապարհներին",
+     "c": "Միայն վարորդի համար",
+     "explanation": "Ամրագոտին պարտադիր է բոլոր ճանապարհներին՝ քաղաքային և միջքաղաքային, վարորդի և բոլոր այն ուղևորների համար, որոնց նստատեղերը հագեցած են դրանով, բացառությամբ կանոններով նախատեսված դեպքերի։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-007",
+   "rights_status": "own",
+   "topic": "atencion",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Durante la conducción, ¿se puede utilizar el teléfono móvil sujetándolo con la mano?",
+     "a": "Sí, si la llamada es breve",
+     "b": "Sí, en vías con poco tráfico",
+     "c": "No, está prohibido",
+     "explanation": "Está prohibido utilizar el teléfono móvil o cualquier otro dispositivo que exija sujetarlo con la mano mientras se conduce, porque reduce la atención y el control del vehículo.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "While driving, may you use a mobile phone holding it in your hand?",
+     "a": "Yes, if the call is short",
+     "b": "Yes, on roads with little traffic",
+     "c": "No, it is forbidden",
+     "explanation": "Using a mobile phone or any other device that requires holding it in the hand while driving is forbidden, because it reduces attention and control of the vehicle.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Можно ли во время движения пользоваться мобильным телефоном, держа его в руке?",
+     "a": "Да, если разговор короткий",
+     "b": "Да, на дорогах с малым движением",
+     "c": "Нет, это запрещено",
+     "explanation": "Во время движения запрещено пользоваться мобильным телефоном или любым другим устройством, которое нужно держать в руке: это снижает внимание и контроль над автомобилем.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Վարելիս թույլատրվո՞ւմ է օգտվել բջջային հեռախոսից՝ այն ձեռքում պահելով։",
+     "a": "Այո, եթե զանգը կարճ է",
+     "b": "Այո, քիչ երթևեկությամբ ճանապարհներին",
+     "c": "Ոչ, արգելված է",
+     "explanation": "Վարելիս արգելվում է օգտվել բջջային հեռախոսից կամ ձեռքում պահելու կարիք ունեցող ցանկացած այլ սարքից, քանի որ դա նվազեցնում է ուշադրությունը և մեքենայի նկատմամբ վերահսկողությունը։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-008",
+   "rights_status": "own",
+   "topic": "prioridad",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En una intersección sin señalizar, tiene prioridad de paso:",
+     "a": "El vehículo que se aproxima por la izquierda",
+     "b": "El vehículo que circula más rápido",
+     "c": "El vehículo que se aproxima por la derecha",
+     "explanation": "En una intersección sin señalizar rige la regla de la derecha: tiene prioridad el vehículo que se aproxima por la derecha, con las excepciones previstas (por ejemplo, vías pavimentadas frente a las de tierra).",
+     "status": "machine"
+    },
+    "en": {
+     "text": "At an unmarked junction, right of way belongs to:",
+     "a": "The vehicle approaching from the left",
+     "b": "The faster vehicle",
+     "c": "The vehicle approaching from the right",
+     "explanation": "At an unmarked junction the priority-to-the-right rule applies: the vehicle approaching from the right has priority, with the exceptions provided for (for example, paved roads over dirt roads).",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "На перекрёстке без знаков приоритет имеет:",
+     "a": "Транспорт, приближающийся слева",
+     "b": "Транспорт, движущийся быстрее",
+     "c": "Транспорт, приближающийся справа",
+     "explanation": "На нерегулируемом перекрёстке без знаков действует правило правой руки: преимущество у транспорта, приближающегося справа, с предусмотренными исключениями (например, асфальтированная дорога имеет преимущество перед грунтовой).",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Նշաններով չկարգավորվող խաչմերուկում առաջնահերթություն ունի՝",
+     "a": "Ձախից մոտեցող տրանսպորտային միջոցը",
+     "b": "Ավելի արագ շարժվող տրանսպորտային միջոցը",
+     "c": "Աջից մոտեցող տրանսպորտային միջոցը",
+     "explanation": "Նշաններով չկարգավորվող խաչմերուկում գործում է աջ ձեռքի կանոնը՝ առավելություն ունի աջից մոտեցող տրանսպորտային միջոցը՝ նախատեսված բացառություններով (օրինակ՝ ասֆալտապատ ճանապարհն առավելություն ունի հողեղենի նկատմամբ)։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-009",
+   "rights_status": "own",
+   "topic": "senales",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Ante una señal de STOP, el conductor debe:",
+     "a": "Reducir la velocidad y pasar si no hay nadie",
+     "b": "Tocar el claxon y continuar",
+     "c": "Detener el vehículo y ceder el paso a los que circulan por la vía",
+     "explanation": "La señal de STOP obliga a detener el vehículo por completo antes de la línea de detención (o, si no hay, antes de la intersección) y a ceder el paso a los vehículos que circulan por la vía a la que se accede.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "At a STOP sign, the driver must:",
+     "a": "Slow down and go on if nobody is coming",
+     "b": "Sound the horn and continue",
+     "c": "Stop the vehicle and give way to traffic on the road",
+     "explanation": "The STOP sign requires a complete stop before the stop line (or, if there is none, before the junction) and giving way to vehicles on the road being joined.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Перед знаком «STOP» водитель обязан:",
+     "a": "Снизить скорость и ехать дальше, если никого нет",
+     "b": "Посигналить и продолжить движение",
+     "c": "Остановить автомобиль и уступить дорогу движущимся по дороге",
+     "explanation": "Знак «STOP» обязывает полностью остановиться перед линией остановки (а если её нет — перед перекрёстком) и уступить дорогу транспорту на дороге, на которую вы выезжаете.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "«STOP» նշանի առջև վարորդը պարտավոր է՝",
+     "a": "Նվազեցնել արագությունը և շարունակել, եթե ոչ ոք չկա",
+     "b": "Ազդանշան տալ և շարունակել",
+     "c": "Կանգնեցնել մեքենան և զիջել ճանապարհը ճանապարհով շարժվողներին",
+     "explanation": "«STOP» նշանը պարտադրում է լիովին կանգ առնել կանգառի գծի առջև (իսկ եթե այն չկա՝ խաչմերուկից առաջ) և ճանապարհը զիջել այն ճանապարհով շարժվող տրանսպորտային միջոցներին, որին միանում եք։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-010",
+   "rights_status": "own",
+   "topic": "senales",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "La señal triangular con el vértice hacia abajo («Ceda el paso») obliga a:",
+     "a": "Ceder el paso a los vehículos de la vía a la que se accede, deteniéndose si es necesario",
+     "b": "Detenerse siempre",
+     "c": "Continuar, porque se tiene prioridad",
+     "explanation": "«Ceda el paso» obliga a dejar pasar a los vehículos que circulan por la vía a la que se accede, y a detenerse solo si es necesario para hacerlo con seguridad.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The triangular sign with its point downwards (\"Give way\") requires you to:",
+     "a": "Give way to vehicles on the road you are joining, stopping if necessary",
+     "b": "Always stop",
+     "c": "Carry on, because you have priority",
+     "explanation": "\"Give way\" requires you to let vehicles on the road you are joining pass, and to stop only if necessary to do so safely.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Треугольный знак вершиной вниз («Уступите дорогу») обязывает:",
+     "a": "Уступить дорогу транспорту на дороге, на которую вы выезжаете, остановившись при необходимости",
+     "b": "Всегда останавливаться",
+     "c": "Ехать дальше, так как у вас есть приоритет",
+     "explanation": "«Уступите дорогу» обязывает пропустить транспорт на дороге, на которую вы выезжаете, и останавливаться только если это необходимо для безопасного проезда.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Գագաթով դեպի ներքև եռանկյուն նշանը («Ճանապարհ զիջեք») պարտադրում է՝",
+     "a": "Ճանապարհը զիջել այն ճանապարհով շարժվողներին, որին միանում եք, անհրաժեշտության դեպքում կանգ առնելով",
+     "b": "Միշտ կանգ առնել",
+     "c": "Շարունակել, քանի որ դուք առաջնահերթություն ունեք",
+     "explanation": "«Ճանապարհ զիջեք» նշանը պարտադրում է թողնել, որ անցնեն այն ճանապարհով շարժվող տրանսպորտային միջոցները, որին միանում եք, և կանգ առնել միայն այն դեպքում, երբ դա անհրաժեշտ է անվտանգ անցնելու համար։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-011",
+   "rights_status": "own",
+   "topic": "adelantamiento",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Si en el eje de una calzada de doble sentido hay una línea longitudinal continua, ¿se puede adelantar rebasándola?",
+     "a": "Sí, si no viene nadie",
+     "b": "No, está prohibido",
+     "c": "Sí, si el vehículo de delante es muy lento",
+     "explanation": "Una línea longitudinal continua prohíbe rebasarla, y por tanto adelantar ocupando el carril contrario, aunque no se vea ningún vehículo venir.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "If there is a solid longitudinal line in the centre of a two-way road, may you overtake by crossing it?",
+     "a": "Yes, if nobody is coming",
+     "b": "No, it is forbidden",
+     "c": "Yes, if the vehicle ahead is very slow",
+     "explanation": "A solid longitudinal line forbids crossing it, and therefore overtaking by using the opposite lane, even if no vehicle can be seen coming.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Если по оси двусторонней дороги проходит сплошная продольная линия, можно ли обгонять, пересекая её?",
+     "a": "Да, если никто не едет навстречу",
+     "b": "Нет, это запрещено",
+     "c": "Да, если впереди очень медленный транспорт",
+     "explanation": "Сплошная продольная линия запрещает её пересекать, а значит и обгонять с выездом на встречную полосу, даже если встречного транспорта не видно.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Եթե երկկողմանի երթևեկությամբ ճանապարհի առանցքով անցնում է ամբողջական երկայնական գիծ, թույլատրվո՞ւմ է այն հատելով վազանցել։",
+     "a": "Այո, եթե ոչ ոք չի գալիս",
+     "b": "Ոչ, արգելված է",
+     "c": "Այո, եթե առջևի մեքենան շատ դանդաղ է",
+     "explanation": "Ամբողջական երկայնական գիծը արգելում է այն հատել, հետևաբար նաև վազանցել հանդիպակաց գոտի դուրս գալով, նույնիսկ եթե ոչ մի մեքենա չի երևում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-012",
+   "rights_status": "own",
+   "topic": "distancia",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "La distancia de seguridad con el vehículo que nos precede debe ser suficiente para:",
+     "a": "Poder detenernos sin colisionar si frena bruscamente",
+     "b": "Poder adelantarlo con facilidad",
+     "c": "Impedir que otros vehículos nos adelanten",
+     "explanation": "La distancia de seguridad debe permitir detener el vehículo sin alcanzar al que va delante en caso de frenada brusca; aumenta con la velocidad y con lluvia, niebla o pavimento deslizante.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The safety distance from the vehicle ahead must be enough to:",
+     "a": "Stop without colliding if it brakes suddenly",
+     "b": "Overtake it easily",
+     "c": "Prevent other vehicles from overtaking us",
+     "explanation": "The safety distance must allow you to stop without hitting the vehicle in front if it brakes suddenly; it increases with speed and in rain, fog or slippery road surfaces.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Дистанция до впереди идущего автомобиля должна быть достаточной, чтобы:",
+     "a": "Остановиться без столкновения, если он резко затормозит",
+     "b": "Легко его обогнать",
+     "c": "Не позволять другим обгонять нас",
+     "explanation": "Дистанция должна позволять остановиться, не задев впереди идущий автомобиль при резком торможении; она увеличивается со скоростью, а также при дожде, тумане и скользком покрытии.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Առջևից գնացող մեքենայի հետ անվտանգ հեռավորությունը պետք է բավարար լինի, որպեսզի՝",
+     "a": "Կանգ առնել առանց բախման, եթե այն կտրուկ արգելակի",
+     "b": "Հեշտությամբ վազանցել այն",
+     "c": "Թույլ չտալ, որ մյուսները վազանցեն մեզ",
+     "explanation": "Անվտանգ հեռավորությունը պետք է թույլ տա կանգ առնել առանց առջևի մեքենային հարվածելու, եթե այն կտրուկ արգելակի. այն մեծանում է արագության հետ, ինչպես նաև անձրևի, մշուշի կամ սահուն ծածկույթի դեպքում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-013",
+   "rights_status": "own",
+   "topic": "seguridad",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Los menores de estatura igual o inferior a 135 cm deben viajar:",
+     "a": "En un sistema de retención infantil homologado, adaptado a su talla y peso",
+     "b": "Con el cinturón de un adulto",
+     "c": "En brazos de un adulto",
+     "explanation": "Los menores de 135 cm o menos deben usar un sistema de retención infantil homologado y adecuado a su talla y peso; el cinturón de adulto no los protege correctamente.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "Children whose height is 135 cm or less must travel:",
+     "a": "In an approved child restraint system suited to their height and weight",
+     "b": "With an adult seat belt",
+     "c": "In an adult's arms",
+     "explanation": "Children of 135 cm or less must use an approved child restraint system suited to their height and weight; an adult belt does not protect them properly.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Дети ростом 135 см и менее должны перевозиться:",
+     "a": "В сертифицированном детском удерживающем устройстве, подходящем по росту и весу",
+     "b": "С обычным ремнём безопасности",
+     "c": "На руках у взрослого",
+     "explanation": "Дети ростом 135 см и менее обязаны ездить в сертифицированном детском удерживающем устройстве, подходящем по росту и весу; взрослый ремень их правильно не защищает.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "135 սմ և ավելի ցածր հասակ ունեցող երեխաները պետք է տեղափոխվեն՝",
+     "a": "Իրենց հասակին և քաշին համապատասխան սերտիֆիկացված մանկական ամրակալման համակարգով",
+     "b": "Մեծահասակի ամրագոտիով",
+     "c": "Մեծահասակի գրկում",
+     "explanation": "135 սմ և ավելի ցածր հասակ ունեցող երեխաները պետք է օգտագործեն իրենց հասակին և քաշին համապատասխան սերտիֆիկացված մանկական ամրակալման համակարգ. մեծահասակի ամրագոտին նրանց պատշաճ կերպով չի պաշտպանում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-014",
+   "rights_status": "own",
+   "topic": "permiso",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Un conductor que obtiene por primera vez el permiso de conducir dispone inicialmente de:",
+     "a": "8 puntos",
+     "b": "12 puntos",
+     "c": "15 puntos",
+     "explanation": "Quien obtiene el permiso por primera vez empieza con 8 puntos; tras un periodo sin infracciones que le hagan perder puntos, el saldo puede subir hasta 12 y, con buen historial, hasta 15.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "A driver who obtains a driving licence for the first time starts with:",
+     "a": "8 points",
+     "b": "12 points",
+     "c": "15 points",
+     "explanation": "A first-time licence holder starts with 8 points; after a period without point-losing offences the balance can rise to 12 and, with a good record, up to 15.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Водитель, впервые получивший права, изначально имеет:",
+     "a": "8 баллов",
+     "b": "12 баллов",
+     "c": "15 баллов",
+     "explanation": "Тот, кто получает права впервые, начинает с 8 баллов; после периода без нарушений, ведущих к потере баллов, счёт может вырасти до 12, а при хорошей истории — до 15.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Վարորդական իրավունքը առաջին անգամ ստացած վարորդը սկզբում ունի՝",
+     "a": "8 միավոր",
+     "b": "12 միավոր",
+     "c": "15 միավոր",
+     "explanation": "Առաջին անգամ վարորդական իրավունք ստացողը սկսում է 8 միավորով. միավորների կորստի հանգեցնող խախտումներ չունենալու որոշակի ժամանակահատվածից հետո հաշվեկշիռը կարող է հասնել 12-ի, իսկ լավ պատմության դեպքում՝ մինչև 15։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-015",
+   "rights_status": "own",
+   "topic": "vehiculo",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "¿A partir de qué antigüedad debe pasar un turismo por primera vez la ITV (inspección técnica)?",
+     "a": "A los 2 años",
+     "b": "A los 6 años",
+     "c": "A los 4 años",
+     "explanation": "Los turismos deben pasar la primera ITV a los 4 años desde su matriculación; después cada 2 años hasta los 10 años, y anualmente a partir de entonces.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "After how many years must a passenger car first pass the ITV (technical inspection)?",
+     "a": "2 years",
+     "b": "6 years",
+     "c": "4 years",
+     "explanation": "Passenger cars must pass their first ITV four years after registration; then every 2 years up to 10 years old, and every year after that.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Через сколько лет легковой автомобиль должен впервые пройти ITV (технический осмотр)?",
+     "a": "Через 2 года",
+     "b": "Через 6 лет",
+     "c": "Через 4 года",
+     "explanation": "Легковой автомобиль проходит первый ITV через 4 года после регистрации; затем каждые 2 года до 10-летнего возраста и ежегодно после этого.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Քանի՞ տարի անց թեթև մեքենան պետք է առաջին անգամ անցնի ITV (տեխնիկական զննում)։",
+     "a": "2 տարի անց",
+     "b": "6 տարի անց",
+     "c": "4 տարի անց",
+     "explanation": "Թեթև մեքենան առաջին ITV-ն պետք է անցնի գրանցումից 4 տարի անց, այնուհետև՝ յուրաքանչյուր 2 տարին մեկ մինչև 10 տարեկանը, իսկ դրանից հետո՝ ամեն տարի։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-016",
+   "rights_status": "own",
+   "topic": "seguridad",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En una motocicleta, el uso del casco homologado es obligatorio:",
+     "a": "Solo en vías interurbanas",
+     "b": "En todas las vías, tanto para el conductor como para el pasajero",
+     "c": "Solo para el conductor",
+     "explanation": "El casco de protección homologado es obligatorio en todas las vías, urbanas e interurbanas, para el conductor y para el pasajero de motocicletas y ciclomotores.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "On a motorcycle, wearing an approved helmet is mandatory:",
+     "a": "Only on interurban roads",
+     "b": "On all roads, for both the rider and the passenger",
+     "c": "Only for the rider",
+     "explanation": "An approved protective helmet is mandatory on all roads, urban and interurban, for both the rider and the passenger of motorcycles and mopeds.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "На мотоцикле использование сертифицированного шлема обязательно:",
+     "a": "Только на междугородних дорогах",
+     "b": "На всех дорогах — и для водителя, и для пассажира",
+     "c": "Только для водителя",
+     "explanation": "Сертифицированный защитный шлем обязателен на всех дорогах, городских и междугородних, как для водителя, так и для пассажира мотоцикла и мопеда.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Մոտոցիկլետով երթևեկելիս սերտիֆիկացված սաղավարտի օգտագործումը պարտադիր է՝",
+     "a": "Միայն միջքաղաքային ճանապարհներին",
+     "b": "Բոլոր ճանապարհներին՝ թե՛ վարորդի, թե՛ ուղևորի համար",
+     "c": "Միայն վարորդի համար",
+     "explanation": "Սերտիֆիկացված պաշտպանիչ սաղավարտը պարտադիր է բոլոր ճանապարհներին՝ քաղաքային և միջքաղաքային, մոտոցիկլետի և մոպեդի թե՛ վարորդի, թե՛ ուղևորի համար։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-017",
+   "rights_status": "own",
+   "topic": "luces",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Al circular por un túnel, ¿qué alumbrado debe llevarse encendido?",
+     "a": "El de posición únicamente",
+     "b": "El de corto alcance (luz de cruce)",
+     "c": "Ninguno, si el túnel está iluminado",
+     "explanation": "En los túneles y pasos inferiores señalizados como tales debe llevarse encendido el alumbrado de corto alcance (cruce), aunque el túnel tenga iluminación propia.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "When driving through a tunnel, which lights must be on?",
+     "a": "Only the position (side) lights",
+     "b": "The dipped headlights (low beam)",
+     "c": "None, if the tunnel is lit",
+     "explanation": "In tunnels and underpasses signed as such the dipped headlights must be on, even if the tunnel has its own lighting.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Какие огни нужно включать при проезде тоннеля?",
+     "a": "Только габаритные",
+     "b": "Ближний свет",
+     "c": "Никакие, если тоннель освещён",
+     "explanation": "В тоннелях и подземных проездах, обозначенных соответствующим знаком, необходимо включать ближний свет, даже если тоннель освещён.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Թունելով անցնելիս ի՞նչ լուսավորություն պետք է միացված լինի։",
+     "a": "Միայն դիրքային լույսերը",
+     "b": "Մոտակա լույսը",
+     "c": "Ոչ մեկը, եթե թունելը լուսավորված է",
+     "explanation": "Թունելներում և ստորգետնյա անցումներում, որոնք նշված են համապատասխան նշանով, պետք է միացված լինի մոտակա լույսը, նույնիսկ եթե թունելն ունի սեփական լուսավորություն։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-018",
+   "rights_status": "own",
+   "topic": "accidentes",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En caso de accidente, ¿cuál es la secuencia de actuación correcta (PAS)?",
+     "a": "Socorrer, avisar, proteger",
+     "b": "Avisar, socorrer, proteger",
+     "c": "Proteger, avisar, socorrer",
+     "explanation": "PAS significa Proteger (señalizar y asegurar el lugar), Avisar (a los servicios de emergencia) y Socorrer (atender a las víctimas sin moverlas innecesariamente).",
+     "status": "machine"
+    },
+    "en": {
+     "text": "After an accident, what is the correct order of action (PAS)?",
+     "a": "Help, alert, protect",
+     "b": "Alert, help, protect",
+     "c": "Protect, alert, help",
+     "explanation": "PAS stands for Protect (mark and secure the scene), Alert (the emergency services) and Help (attend to the victims without moving them unnecessarily).",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Какова правильная последовательность действий при аварии (PAS)?",
+     "a": "Помочь, сообщить, защитить",
+     "b": "Сообщить, помочь, защитить",
+     "c": "Защитить, сообщить, помочь",
+     "explanation": "PAS означает: Proteger — защитить (обозначить и обезопасить место), Avisar — сообщить (экстренным службам), Socorrer — помочь (оказать помощь пострадавшим, без необходимости их не двигая).",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Պատահարի դեպքում գործողությունների ո՞ր հաջորդականությունն է ճիշտ (PAS)։",
+     "a": "Օգնել, տեղեկացնել, պաշտպանել",
+     "b": "Տեղեկացնել, օգնել, պաշտպանել",
+     "c": "Պաշտպանել, տեղեկացնել, օգնել",
+     "explanation": "PAS նշանակում է՝ Proteger՝ պաշտպանել (նշել և ապահովել վայրը), Avisar՝ տեղեկացնել (շտապ ծառայություններին), Socorrer՝ օգնել (օգնություն ցույց տալ տուժածներին՝ առանց անհարկի շարժելու)։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-019",
+   "rights_status": "own",
+   "topic": "accidentes",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "¿A qué número de teléfono se debe llamar para avisar de un accidente con heridos?",
+     "a": "091",
+     "b": "112",
+     "c": "900",
+     "explanation": "El 112 es el número único de emergencias en España y en toda la Unión Europea; la llamada es gratuita y da acceso a ambulancias, policía y bomberos.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "Which phone number should you call to report an accident with injured people?",
+     "a": "091",
+     "b": "112",
+     "c": "900",
+     "explanation": "112 is the single emergency number in Spain and across the European Union; the call is free and gives access to ambulances, police and fire services.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "По какому номеру нужно звонить, чтобы сообщить об аварии с пострадавшими?",
+     "a": "091",
+     "b": "112",
+     "c": "900",
+     "explanation": "112 — единый номер экстренных служб в Испании и во всём Евросоюзе; звонок бесплатный и обеспечивает связь со скорой помощью, полицией и пожарными.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Ո՞ր հեռախոսահամարով պետք է զանգել՝ վիրավորներով պատահարի մասին հայտնելու համար։",
+     "a": "091",
+     "b": "112",
+     "c": "900",
+     "explanation": "112-ը շտապ օգնության միասնական համարն է Իսպանիայում և ողջ Եվրամիությունում. զանգն անվճար է և կապ է ապահովում շտապ օգնության, ոստիկանության և հրշեջների հետ։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-020",
+   "rights_status": "own",
+   "topic": "autopista",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "¿Está permitido circular marcha atrás por una autopista o autovía?",
+     "a": "Sí, si el tramo es corto",
+     "b": "No, está prohibido",
+     "c": "Sí, si no hay otros vehículos",
+     "explanation": "Está prohibido circular marcha atrás en autopistas y autovías, incluso en tramos cortos o sin tráfico, porque es una maniobra muy peligrosa a esas velocidades.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "May you reverse along a motorway or dual carriageway?",
+     "a": "Yes, for a short stretch",
+     "b": "No, it is forbidden",
+     "c": "Yes, if there are no other vehicles",
+     "explanation": "Reversing on motorways and dual carriageways is forbidden, even for short stretches or with no traffic, because it is extremely dangerous at those speeds.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Разрешено ли двигаться задним ходом по автописте или автовии?",
+     "a": "Да, на коротком участке",
+     "b": "Нет, это запрещено",
+     "c": "Да, если нет других машин",
+     "explanation": "Движение задним ходом по автопистам и автовиям запрещено, даже на коротких участках и при отсутствии транспорта: на таких скоростях этот манёвр крайне опасен.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Թույլատրվո՞ւմ է հետընթաց շարժվել ավտոմայրուղով կամ արագընթաց ճանապարհով։",
+     "a": "Այո, կարճ հատվածում",
+     "b": "Ոչ, արգելված է",
+     "c": "Այո, եթե այլ մեքենաներ չկան",
+     "explanation": "Ավտոմայրուղիներում և արագընթաց ճանապարհներում հետընթաց շարժվելն արգելված է՝ նույնիսկ կարճ հատվածներում կամ երթևեկության բացակայության դեպքում, քանի որ այդ արագությունների պայմաններում այս մանևրը չափազանց վտանգավոր է։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-021",
+   "rights_status": "own",
+   "topic": "senales",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Ante un semáforo con luz amarilla fija, el conductor debe:",
+     "a": "Acelerar para cruzar antes de que se ponga en rojo",
+     "b": "Detenerse, salvo que esté tan cerca que no pueda hacerlo en condiciones de seguridad",
+     "c": "Detenerse siempre con una frenada brusca",
+     "explanation": "La luz amarilla fija obliga a detenerse, salvo que al encenderse el vehículo se encuentre tan cerca de la línea de detención que no pueda parar en condiciones de seguridad.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "At a traffic light showing a steady amber, the driver must:",
+     "a": "Speed up to cross before it turns red",
+     "b": "Stop, unless too close to do so safely",
+     "c": "Always stop with a sudden brake",
+     "explanation": "A steady amber requires you to stop, unless when it comes on the vehicle is so close to the stop line that it cannot stop safely.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "При постоянном жёлтом сигнале светофора водитель должен:",
+     "a": "Ускориться, чтобы проехать до красного",
+     "b": "Остановиться, если только он не так близко, что не может сделать это безопасно",
+     "c": "Всегда останавливаться резким торможением",
+     "explanation": "Постоянный жёлтый сигнал обязывает остановиться, если только в момент его включения автомобиль не находится так близко к линии остановки, что не может остановиться безопасно.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Լուսակիրի անընդհատ դեղին լույսի դեպքում վարորդը պետք է՝",
+     "a": "Արագացնել՝ կարմիրը միանալուց առաջ անցնելու համար",
+     "b": "Կանգ առնել, բացառությամբ այն դեպքի, երբ այնքան մոտ է, որ անվտանգ կանգ առնել չի կարող",
+     "c": "Միշտ կանգ առնել կտրուկ արգելակումով",
+     "explanation": "Անընդհատ դեղին լույսը պարտադրում է կանգ առնել, եթե միայն դրա միանալու պահին մեքենան կանգի գծին այնքան մոտ չէ, որ չի կարող անվտանգ կանգ առնել։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-022",
+   "rights_status": "own",
+   "topic": "prioridad",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En una glorieta (rotonda), sin señalización en contra, tiene prioridad:",
+     "a": "El vehículo que quiere acceder a ella",
+     "b": "El vehículo que llega por la derecha de la vía de acceso",
+     "c": "El vehículo que ya circula por su interior",
+     "explanation": "En las glorietas tienen prioridad los vehículos que ya circulan por su interior sobre los que pretenden acceder, salvo que una señal disponga otra cosa.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "At a roundabout, unless signs say otherwise, priority belongs to:",
+     "a": "The vehicle wanting to enter it",
+     "b": "The vehicle coming from the right on the access road",
+     "c": "The vehicle already circulating inside it",
+     "explanation": "At roundabouts, vehicles already circulating inside have priority over those wanting to enter, unless a sign provides otherwise.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "На круговом перекрёстке, если нет других указаний знаков, приоритет имеет:",
+     "a": "Транспорт, который хочет въехать",
+     "b": "Транспорт, приближающийся справа по въездной дороге",
+     "c": "Транспорт, уже движущийся по кругу",
+     "explanation": "На круговых перекрёстках преимущество имеет транспорт, уже движущийся внутри кольца, перед тем, кто собирается въехать, если знаки не предписывают иное.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Շրջանաձև խաչմերուկում, եթե նշանները հակառակը չեն սահմանում, առաջնահերթություն ունի՝",
+     "a": "Դրան մտնել ցանկացող տրանսպորտային միջոցը",
+     "b": "Մուտքի ճանապարհով աջից մոտեցող տրանսպորտային միջոցը",
+     "c": "Արդեն դրա ներսում շարժվող տրանսպորտային միջոցը",
+     "explanation": "Շրջանաձև խաչմերուկներում առաջնահերթություն ունեն արդեն օղակի ներսում շարժվող տրանսպորտային միջոցները՝ մտնել ցանկացողների նկատմամբ, եթե նշանները այլ բան չեն սահմանում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-023",
+   "rights_status": "own",
+   "topic": "conduccion",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Para reducir el consumo de combustible en una conducción eficiente conviene:",
+     "a": "Circular siempre en marchas cortas",
+     "b": "Utilizar marchas largas a bajas revoluciones, sin acelerones",
+     "c": "Acelerar y frenar bruscamente",
+     "explanation": "La conducción eficiente ahorra combustible: cambiar pronto a marchas largas, mantener bajas revoluciones, anticiparse al tráfico y evitar acelerones y frenazos.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "To cut fuel consumption when driving efficiently, you should:",
+     "a": "Always drive in low gears",
+     "b": "Use high gears at low revs, without sudden acceleration",
+     "c": "Accelerate and brake sharply",
+     "explanation": "Efficient driving saves fuel: change up early to high gears, keep revs low, anticipate the traffic and avoid sudden acceleration and braking.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Чтобы сократить расход топлива при экономичном вождении, следует:",
+     "a": "Всегда ехать на низких передачах",
+     "b": "Использовать высокие передачи на низких оборотах, без резких разгонов",
+     "c": "Резко разгоняться и тормозить",
+     "explanation": "Экономичное вождение экономит топливо: рано переключаться на высокие передачи, держать низкие обороты, предвидеть обстановку и избегать резких разгонов и торможений.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Արդյունավետ վարելիս վառելիքի ծախսը նվազեցնելու համար պետք է՝",
+     "a": "Միշտ վարել ցածր փոխանցումներով",
+     "b": "Օգտագործել բարձր փոխանցումներ ցածր պտույտներով՝ առանց կտրուկ արագացումների",
+     "c": "Կտրուկ արագանալ և արգելակել",
+     "explanation": "Արդյունավետ վարումը խնայում է վառելիք. պետք է շուտ անցնել բարձր փոխանցումների, պահել ցածր պտույտներ, կանխատեսել երթևեկությունը և խուսափել կտրուկ արագացումներից ու արգելակումներից։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-024",
+   "rights_status": "own",
+   "topic": "vehiculo",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "La profundidad mínima legal del dibujo de los neumáticos de un turismo es de:",
+     "a": "1,6 mm",
+     "b": "1 mm",
+     "c": "3 mm",
+     "explanation": "La profundidad mínima legal del dibujo es de 1,6 mm; por debajo, el neumático no evacua bien el agua y aumenta el riesgo de aquaplaning y la distancia de frenado.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The minimum legal tread depth of a car's tyres is:",
+     "a": "1.6 mm",
+     "b": "1 mm",
+     "c": "3 mm",
+     "explanation": "The minimum legal tread depth is 1.6 mm; below that the tyre does not clear water well, which raises the risk of aquaplaning and lengthens braking distance.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Минимальная законная глубина протектора шин легкового автомобиля составляет:",
+     "a": "1,6 мм",
+     "b": "1 мм",
+     "c": "3 мм",
+     "explanation": "Минимальная допустимая глубина рисунка протектора — 1,6 мм; при меньшей шина плохо отводит воду, растёт риск аквапланирования и тормозной путь.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Թեթև մեքենայի անվադողերի նախշի օրինական նվազագույն խորությունը՝",
+     "a": "1,6 մմ",
+     "b": "1 մմ",
+     "c": "3 մմ",
+     "explanation": "Նախշի օրինական նվազագույն խորությունը 1,6 մմ է. դրանից ցածր անվադողը վատ է հեռացնում ջուրը, ինչը մեծացնում է ջրասահքի վտանգը և արգելակման ճանապարհը։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-025",
+   "rights_status": "own",
+   "topic": "fatiga",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "En viajes largos, ¿cada cuánto tiempo se recomienda parar a descansar?",
+     "a": "Cada 5 horas",
+     "b": "Solo cuando se note cansancio",
+     "c": "Cada 2 horas o 200 km",
+     "explanation": "Se recomienda descansar unos 15 minutos cada 2 horas o 200 km, sin esperar a sentir fatiga: los primeros síntomas ya indican que la capacidad de conducir está reducida.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "On long journeys, how often is it recommended to stop for a rest?",
+     "a": "Every 5 hours",
+     "b": "Only when you feel tired",
+     "c": "Every 2 hours or 200 km",
+     "explanation": "It is recommended to rest for about 15 minutes every 2 hours or 200 km, without waiting to feel fatigue: the first symptoms already mean your driving ability is reduced.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Как часто рекомендуется останавливаться на отдых в дальних поездках?",
+     "a": "Каждые 5 часов",
+     "b": "Только когда почувствуешь усталость",
+     "c": "Каждые 2 часа или 200 км",
+     "explanation": "Рекомендуется отдыхать около 15 минут каждые 2 часа или 200 км, не дожидаясь усталости: первые симптомы уже означают снижение способности управлять автомобилем.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Երկար ուղևորությունների ժամանակ որքա՞ն հաճախ է խորհուրդ տրվում կանգ առնել հանգստանալու համար։",
+     "a": "Յուրաքանչյուր 5 ժամը մեկ",
+     "b": "Միայն հոգնածություն զգալիս",
+     "c": "Յուրաքանչյուր 2 ժամը կամ 200 կմ-ը մեկ",
+     "explanation": "Խորհուրդ է տրվում հանգստանալ մոտ 15 րոպե՝ յուրաքանչյուր 2 ժամը կամ 200 կմ-ը մեկ, առանց սպասելու հոգնածության զգացմանը. առաջին ախտանշաններն արդեն նշանակում են, որ վարելու ունակությունը նվազել է։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-026",
+   "rights_status": "own",
+   "topic": "salud",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Un medicamento con el pictograma de un coche dentro de un triángulo en su envase indica que:",
+     "a": "No afecta a la conducción",
+     "b": "Solo afecta a los conductores profesionales",
+     "c": "Puede afectar a la capacidad para conducir; hay que leer el prospecto y consultar al médico o farmacéutico",
+     "explanation": "El pictograma avisa de que el medicamento puede reducir la atención y los reflejos. Conviene leer el prospecto y consultar al médico o al farmacéutico antes de conducir.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "A medicine with a car-in-a-triangle pictogram on its box means that:",
+     "a": "It does not affect driving",
+     "b": "It only affects professional drivers",
+     "c": "It may affect your ability to drive; read the leaflet and ask your doctor or pharmacist",
+     "explanation": "The pictogram warns that the medicine may reduce attention and reflexes. Read the leaflet and ask your doctor or pharmacist before driving.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Лекарство с пиктограммой автомобиля в треугольнике на упаковке означает, что:",
+     "a": "Оно не влияет на вождение",
+     "b": "Оно влияет только на профессиональных водителей",
+     "c": "Оно может влиять на способность управлять автомобилем; прочитайте инструкцию и проконсультируйтесь с врачом или фармацевтом",
+     "explanation": "Пиктограмма предупреждает, что лекарство может снижать внимание и реакцию. Перед поездкой прочитайте инструкцию и проконсультируйтесь с врачом или фармацевтом.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Փաթեթավորման վրա եռանկյան մեջ մեքենայի պատկերանշան ունեցող դեղամիջոցը նշանակում է, որ՝",
+     "a": "Այն չի ազդում վարելու վրա",
+     "b": "Այն ազդում է միայն մասնագիտական վարորդների վրա",
+     "c": "Այն կարող է ազդել վարելու ունակության վրա. կարդացեք ցուցումը և խորհրդակցեք բժշկի կամ դեղագործի հետ",
+     "explanation": "Պատկերանշանը զգուշացնում է, որ դեղամիջոցը կարող է նվազեցնել ուշադրությունը և ռեֆլեքսները։ Վարելուց առաջ կարդացեք ցուցումը և խորհրդակցեք բժշկի կամ դեղագործի հետ։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-027",
+   "rights_status": "own",
+   "topic": "pasos",
+   "correct": "c",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Al acercarse a un paso a nivel cuyas luces rojas parpadean o suena la alarma, el conductor debe:",
+     "a": "Cruzar rápidamente antes de que baje la barrera",
+     "b": "Reducir la velocidad y cruzar con precaución",
+     "c": "Detenerse",
+     "explanation": "Las luces rojas intermitentes o la señal acústica de un paso a nivel obligan a detenerse; está prohibido cruzar aunque no se vea aún ningún tren.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "When approaching a level crossing whose red lights are flashing or whose alarm is sounding, the driver must:",
+     "a": "Cross quickly before the barrier comes down",
+     "b": "Slow down and cross with caution",
+     "c": "Stop",
+     "explanation": "Flashing red lights or the alarm at a level crossing require you to stop; crossing is forbidden even if no train can yet be seen.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "При приближении к железнодорожному переезду, где мигают красные огни или звучит сигнал, водитель должен:",
+     "a": "Быстро проехать, пока не опустился шлагбаум",
+     "b": "Снизить скорость и проехать осторожно",
+     "c": "Остановиться",
+     "explanation": "Мигающие красные огни или звуковой сигнал на переезде обязывают остановиться; проезд запрещён, даже если поезд ещё не виден.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Երկաթուղային անցումին մոտենալիս, երբ կարմիր լույսերը թարթում են կամ հնչում է ազդանշանը, վարորդը պետք է՝",
+     "a": "Արագ անցնել՝ մինչև պատնեշի իջնելը",
+     "b": "Նվազեցնել արագությունը և զգուշությամբ անցնել",
+     "c": "Կանգ առնել",
+     "explanation": "Երկաթուղային անցման թարթող կարմիր լույսերը կամ ձայնային ազդանշանը պարտադրում են կանգ առնել. անցնելն արգելված է, նույնիսկ եթե գնացքը դեռ չի երևում։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-028",
+   "rights_status": "own",
+   "topic": "prioridad",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Ante un vehículo prioritario (ambulancia, policía, bomberos) con señales luminosas y acústicas en funcionamiento, hay que:",
+     "a": "Acelerar para apartarse cuanto antes",
+     "b": "Facilitarle el paso, apartándose y deteniéndose si es necesario",
+     "c": "Seguir circulando sin variar la marcha",
+     "explanation": "Los vehículos prioritarios en servicio de urgencia, con señales luminosas y acústicas, tienen preferencia: hay que facilitarles el paso apartándose y, si hace falta, deteniéndose, sin cometer infracciones.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "When a priority vehicle (ambulance, police, fire engine) approaches with lights and sirens on, you must:",
+     "a": "Speed up to get out of the way quickly",
+     "b": "Let it pass, pulling aside and stopping if necessary",
+     "c": "Carry on without changing your driving",
+     "explanation": "Priority vehicles on an emergency call, with lights and sirens on, have precedence: you must let them pass by pulling aside and, if needed, stopping, without committing any offence.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Если приближается специальный автомобиль (скорая, полиция, пожарные) с включёнными проблесковыми маячками и сиреной, нужно:",
+     "a": "Ускориться, чтобы поскорее освободить дорогу",
+     "b": "Уступить дорогу, прижавшись к краю и при необходимости остановившись",
+     "c": "Продолжать движение, ничего не меняя",
+     "explanation": "Специальные автомобили при выполнении срочного задания с маячками и сиреной имеют преимущество: нужно уступить им дорогу, прижавшись к краю и при необходимости остановившись, но не нарушая правил.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Երբ մոտենում է առաջնահերթ տրանսպորտային միջոց (շտապ օգնություն, ոստիկանություն, հրշեջներ)՝ միացված լուսային և ձայնային ազդանշաններով, պետք է՝",
+     "a": "Արագացնել՝ որքան հնարավոր է շուտ ճանապարհը ազատելու համար",
+     "b": "Ճանապարհ զիջել՝ մի կողմ քաշվելով և անհրաժեշտության դեպքում կանգ առնելով",
+     "c": "Շարունակել շարժվել՝ ոչինչ չփոխելով",
+     "explanation": "Շտապ առաջադրանք կատարող առաջնահերթ տրանսպորտային միջոցները՝ լուսային և ձայնային ազդանշաններով, առավելություն ունեն. պետք է ճանապարհ զիջել՝ մի կողմ քաշվելով և անհրաժեշտության դեպքում կանգ առնելով՝ առանց կանոնները խախտելու։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-029",
+   "rights_status": "own",
+   "topic": "peatones",
+   "correct": "b",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "Al girar a la derecha en una intersección, si hay peatones cruzando la calzada a la que se accede, tiene prioridad:",
+     "a": "El vehículo que gira",
+     "b": "El peatón que cruza",
+     "c": "Quien llegue primero",
+     "explanation": "Cuando se gira y hay peatones cruzando la calzada a la que se accede, los peatones tienen prioridad: el conductor debe detenerse y dejarlos pasar.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "When turning right at a junction, if pedestrians are crossing the road you are entering, priority belongs to:",
+     "a": "The turning vehicle",
+     "b": "The pedestrian who is crossing",
+     "c": "Whoever arrives first",
+     "explanation": "When turning and pedestrians are crossing the road you are entering, pedestrians have priority: the driver must stop and let them cross.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "При повороте направо на перекрёстке, если пешеходы переходят дорогу, на которую вы поворачиваете, приоритет имеет:",
+     "a": "Поворачивающий автомобиль",
+     "b": "Пешеход, переходящий дорогу",
+     "c": "Тот, кто подъехал первым",
+     "explanation": "При повороте, когда пешеходы переходят дорогу, на которую вы въезжаете, преимущество у пешеходов: водитель обязан остановиться и пропустить их.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Խաչմերուկում աջ շրջվելիս, եթե հետիոտները հատում են այն ճանապարհը, որին մոտենում եք, առաջնահերթություն ունի՝",
+     "a": "Շրջվող տրանսպորտային միջոցը",
+     "b": "Ճանապարհը հատող հետիոտնը",
+     "c": "Նա, ով առաջինը հասել է",
+     "explanation": "Շրջվելիս, երբ հետիոտները հատում են այն ճանապարհը, որին մոտենում եք, առավելությունը հետիոտների կողմն է. վարորդը պարտավոր է կանգ առնել և թույլ տալ նրանց անցնել։",
+     "status": "machine"
+    }
+   }
+  },
+  {
+   "source": "manual",
+   "source_ref": "seed-030",
+   "rights_status": "own",
+   "topic": "seguridad",
+   "correct": "a",
+   "image_url": null,
+   "is_active": true,
+   "i18n": {
+    "es": {
+     "text": "El reposacabezas del asiento debe regularse de modo que su parte superior quede a la altura de:",
+     "a": "La parte superior de la cabeza (o, como mínimo, de los ojos)",
+     "b": "El cuello",
+     "c": "Los hombros",
+     "explanation": "El reposacabezas debe quedar a la altura de la parte superior de la cabeza (como mínimo, de los ojos) y lo más cerca posible de la nuca, para proteger las cervicales en una colisión.",
+     "status": "machine"
+    },
+    "en": {
+     "text": "The seat head restraint should be adjusted so that its top is level with:",
+     "a": "The top of the head (or at least the eyes)",
+     "b": "The neck",
+     "c": "The shoulders",
+     "explanation": "The head restraint should be level with the top of the head (at least the eyes) and as close to the back of the head as possible, to protect the neck in a collision.",
+     "status": "machine"
+    },
+    "ru": {
+     "text": "Подголовник сиденья следует отрегулировать так, чтобы его верхний край находился на уровне:",
+     "a": "Макушки (или, как минимум, глаз)",
+     "b": "Шеи",
+     "c": "Плеч",
+     "explanation": "Подголовник должен находиться на уровне макушки (как минимум — глаз) и как можно ближе к затылку, чтобы защитить шейный отдел позвоночника при столкновении.",
+     "status": "machine"
+    },
+    "hy": {
+     "text": "Նստատեղի գլխակալը պետք է կարգավորվի այնպես, որ դրա վերին մասը լինի՝",
+     "a": "Գլխի վերին մասի (կամ առնվազն աչքերի) մակարդակին",
+     "b": "Պարանոցի մակարդակին",
+     "c": "Ուսերի մակարդակին",
+     "explanation": "Գլխակալը պետք է լինի գլխի վերին մասի (առնվազն աչքերի) մակարդակին և հնարավորինս մոտ ծոծրակին՝ բախման ժամանակ պարանոցը պաշտպանելու համար։",
+     "status": "machine"
+    }
+   }
+  }
+ ]
+}
