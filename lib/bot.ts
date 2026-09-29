@@ -10,6 +10,7 @@ import {
 import { getQuestionOfDay, getQuestionsByIds } from './repo/content';
 import { submitDaily, RuleError } from './repo/progress';
 import { getProfileByTelegramId, getStats, listNotifiable, setNotify, upsertTelegramUser } from './repo/users';
+import { confirmLoginTicket } from './repo/login-tickets';
 import { choicesOf, type Choice, type Profile } from './types';
 import { isChoice } from './engine';
 
@@ -50,7 +51,8 @@ export async function handleUpdate(update: any, tg: TgCall = callTelegram): Prom
   if (!m?.text || !m.from || m.chat?.type !== 'private') return;
 
   const chatId: number = m.chat.id;
-  const cmd = String(m.text).trim().split(/[\s@]/)[0].toLowerCase();
+  const text = String(m.text).trim();
+  const cmd = text.split(/[\s@]/)[0].toLowerCase();
 
   if (cmd === '/start' || cmd === '/resume') {
     // контакт сохраняется сразу: человек мог ещё не входить на сайт
@@ -58,6 +60,23 @@ export async function handleUpdate(update: any, tg: TgCall = callTelegram): Prom
       id: m.from.id, first_name: m.from.first_name, last_name: m.from.last_name, username: m.from.username,
     });
     await setNotify(profile.id, true);
+
+    // Вход через бота напрямую (кнопка «Войти через Telegram» на сайте): /start login_<token>
+    const payload = text.slice(cmd.length).trim();
+    if (payload.startsWith('login_')) {
+      const confirmed = await confirmLoginTicket(payload.slice('login_'.length), m.from.id);
+      if (confirmed) {
+        await tg('sendMessage', {
+          chat_id: chatId,
+          parse_mode: 'HTML',
+          text: `✅ Вход подтверждён, ${esc(m.from.first_name || '')}! Вернитесь на сайт — вы уже авторизованы.\n\n${HELP}`,
+          reply_markup: openAppKeyboard('/dashboard'),
+        });
+        return;
+      }
+      // тикет не найден/истёк/уже использован — не молчим, просто идём дальше обычным приветствием
+    }
+
     await tg('sendMessage', {
       chat_id: chatId,
       parse_mode: 'HTML',
