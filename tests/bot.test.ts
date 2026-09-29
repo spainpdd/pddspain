@@ -6,6 +6,7 @@ import { getStats, getProfileByTelegramId } from '../lib/repo/users';
 import { TelegramError } from '../lib/telegram';
 import { getQuestionOfDay } from '../lib/repo/content';
 import { madridDateKey } from '../lib/engine';
+import { createLoginTicket, getLoginTicket } from '../lib/repo/login-tickets';
 
 let db: Db;
 const calls: { method: string; payload: any }[] = [];
@@ -36,6 +37,20 @@ describe('бот', () => {
     expect(p!.notify).toBe(true);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('вопрос дня');
+  });
+
+  it('/start login_<token> подтверждает вход через бота (кнопка на сайте) и отдельно приветствует', async () => {
+    const token = await createLoginTicket();
+    await handleUpdate(msg(5559, `/start login_${token}`), tg);
+    expect(await getLoginTicket(token)).toMatchObject({ status: 'confirmed', telegram_id: 5559 });
+    expect(calls[0].payload.text).toContain('Вход подтверждён');
+  });
+
+  it('/start с несуществующим/истёкшим тикетом не падает — обычное приветствие', async () => {
+    await handleUpdate(msg(5560, '/start login_does-not-exist'), tg);
+    expect(calls[0].payload.text).toContain('вопрос дня');
+    const p = await getProfileByTelegramId(5560);
+    expect(p).not.toBeNull(); // контакт всё равно сохраняется
   });
 
   it('/question присылает вопрос дня с оригиналом и переводом и кнопками A/B/C', async () => {
