@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getSessionUser } from '@/lib/auth';
 import { env } from '@/lib/env';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
+import TelegramBotLoginButton from '@/components/TelegramBotLoginButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Вход' };
@@ -26,7 +27,17 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
 
       <div className="mt-8 w-full">
         {bot ? (
-          <TelegramLoginButton bot={bot} />
+          <>
+            <TelegramBotLoginButton />
+            <details className="mt-6 text-left">
+              <summary className="cursor-pointer select-none text-center text-sm text-slate-500 underline">
+                Не работает? Войти через браузер
+              </summary>
+              <div className="mt-4">
+                <TelegramLoginButton bot={bot} />
+              </div>
+            </details>
+          </>
         ) : (
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
             Не задан NEXT_PUBLIC_TELEGRAM_BOT_USERNAME — кнопка Telegram недоступна.
