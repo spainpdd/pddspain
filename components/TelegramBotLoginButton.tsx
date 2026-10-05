@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { LOGIN, type SiteLang } from '@/lib/site-i18n';
 
 /**
  * Вход через Telegram-бота напрямую: t.me/<bot>?start=login_<token> вместо
@@ -14,7 +15,8 @@ type Status = 'idle' | 'starting' | 'waiting' | 'confirmed' | 'error' | 'timeout
 const POLL_MS = 2000;
 const TIMEOUT_MS = 9 * 60 * 1000; // чуть меньше TTL тикета на сервере (10 мин, см. lib/repo/login-tickets.ts)
 
-export default function TelegramBotLoginButton() {
+export default function TelegramBotLoginButton({ lang = 'ru' }: { lang?: SiteLang }) {
+  const t = LOGIN[lang].tg;
   const [status, setStatus] = useState<Status>('idle');
   const [botUrl, setBotUrl] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,12 +69,12 @@ export default function TelegramBotLoginButton() {
     return (
       <div className="flex flex-col items-center gap-3">
         <button className="btn btn-primary w-full" disabled data-testid="tg-bot-login">
-          <TgIcon /> Ждём подтверждения в Telegram…
+          <TgIcon /> {t.waiting}
         </button>
         <p className="text-xs text-slate-500">
-          Приложение не открылось само?{' '}
+          {t.notOpened}{' '}
           <a className="underline" href={botUrl ?? '#'}>
-            Нажмите сюда
+            {t.clickHere}
           </a>
           .
         </p>
@@ -84,10 +86,10 @@ export default function TelegramBotLoginButton() {
     return (
       <div className="flex flex-col items-center gap-3">
         <p className="text-sm text-amber-700">
-          {status === 'timeout' ? 'Не дождались подтверждения. Попробуйте ещё раз.' : 'Не удалось начать вход. Попробуйте ещё раз.'}
+          {status === 'timeout' ? t.timeout : t.failed}
         </p>
         <button className="btn btn-primary w-full" onClick={start} data-testid="tg-bot-login">
-          <TgIcon /> Попробовать снова
+          <TgIcon /> {t.retry}
         </button>
       </div>
     );
@@ -95,7 +97,7 @@ export default function TelegramBotLoginButton() {
 
   return (
     <button className="btn btn-primary w-full" onClick={start} disabled={status === 'starting'} data-testid="tg-bot-login">
-      <TgIcon /> Войти через Telegram
+      <TgIcon /> {t.signIn}
     </button>
   );
 }

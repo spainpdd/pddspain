@@ -94,22 +94,43 @@ export function hasPaidAccess(accessUntil: string | Date | null | undefined, now
 
 export interface FreeAccess {
   paid: boolean;
-  /** Номер теста, уже выбранного сегодня как бесплатный (null — выбор ещё не сделан) */
+  /** Номер нового (ещё не сданного) теста, который пользователь уже начал сегодня (null — ещё нет) */
   todayFreeTest: number | null;
+  /** Уже сданные официальные тесты — их можно открывать повторно без ограничений дня */
+  passedTests?: number[];
 }
 
 /**
- * Можно ли открыть тест n.
+ * Можно ли открыть тест n (порядок «по очереди» задаёт computeStatuses — это про оплату).
  *  • «mixed»        — без платного доступа, всегда открыт.
- *  • платный доступ — открыто всё.
- *  • иначе          — бесплатно только из первых FREE_TEST_POOL тестов, и только один
- *                      в день (тот, что уже выбран сегодня, либо ещё не выбранный).
+ *  • платный доступ — открыто всё, что открыто по очереди.
+ *  • иначе          — бесплатно только тесты 1…FREE_TEST_POOL: уже сданные — всегда
+ *                      (повторение), а новый — один в день (тот, что начат сегодня,
+ *                      либо ещё не начатый).
  */
 export function canOpenTest(category: TestCategory, n: number, acc: FreeAccess): boolean {
   if (category === 'mixed') return true;
   if (acc.paid) return true;
   if (n > FREE_TEST_POOL) return false;
+  if (acc.passedTests?.includes(n)) return true;
   return acc.todayFreeTest === null || acc.todayFreeTest === n;
+}
+
+/** «Готовность к экзамену»: доля сданных тестов от их общего числа, 0…100 */
+export function readinessPercent(passedTests: number, totalTests: number): number {
+  if (totalTests <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round((passedTests / totalTests) * 100)));
+}
+
+export type ErrorTone = 'perfect' | 'one' | 'two' | 'bad' | 'none';
+
+/** Цвет плитки по лучшему результату: 0 ошибок — зелёный, 1 — жёлтый, 2 — оранжевый, 3+ — красный */
+export function errorTone(bestErrors: number | null | undefined): ErrorTone {
+  if (bestErrors === null || bestErrors === undefined) return 'none';
+  if (bestErrors <= 0) return 'perfect';
+  if (bestErrors === 1) return 'one';
+  if (bestErrors === 2) return 'two';
+  return 'bad';
 }
 
 export function addDays(base: Date, days: number): Date {

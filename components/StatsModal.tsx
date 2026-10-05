@@ -6,7 +6,7 @@ import { X, ChevronRight } from 'lucide-react';
 import { plural } from '@/lib/utils';
 import type { Stats } from '@/lib/repo/users';
 
-export default function StatsModal({ stats, readiness }: { stats: Stats; readiness: number }) {
+export default function StatsModal({ stats, readiness, passedTests, totalTests }: { stats: Stats; readiness: number; passedTests: number; totalTests: number }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -38,7 +38,9 @@ export default function StatsModal({ stats, readiness }: { stats: Stats; readine
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                 <div className="h-full rounded-full bg-brand-500" style={{ width: `${readiness}%` }} />
               </div>
-              <p className="mt-3 text-xs text-slate-400">Считаем по числу пройденных вопросов и точности ответов</p>
+              <p className="mt-3 text-xs text-slate-400">
+                Сдано тестов: {passedTests} из {totalTests} (не более 2 ошибок в тесте)
+              </p>
             </div>
 
             <Link

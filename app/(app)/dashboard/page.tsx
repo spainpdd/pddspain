@@ -4,7 +4,7 @@ import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
 import { listTests } from '@/lib/repo/content';
 import { getPricing } from '@/lib/repo/config';
-import { TEST_COUNT, currentTest, canOpenTest } from '@/lib/engine';
+import { TEST_COUNT, currentTest, canOpenTest, readinessPercent } from '@/lib/engine';
 import InstallHint from '@/components/InstallHint';
 import StatsModal from '@/components/StatsModal';
 import { formatDate, formatPrice, plural } from '@/lib/utils';
@@ -16,10 +16,10 @@ export default async function DashboardPage() {
   const [stats, tests, acc, pricing] = await Promise.all([getStats(user.id), listTests(user.id), accessInfo(user), getPricing()]);
   const officialTests = tests.filter((t) => t.category === 'official');
   const passed = officialTests.filter((t) => t.status === 'passed').length;
-  const total = Math.max(officialTests.length, 1);
+  const total = Math.max(officialTests.length, TEST_COUNT);
   const cur = currentTest(tests);
   const curAllowed = cur ? canOpenTest('official', cur, acc) : true;
-  const readiness = Math.max(0, Math.min(100, Math.round(0.5 * (passed / total) * 100 + 0.5 * stats.accuracy_last30)));
+  const readiness = readinessPercent(passed, total);
   const priceText = formatPrice(pricing, user.trans_lang);
 
   return (
@@ -36,19 +36,19 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mb-6">
-        <StatsModal stats={stats} readiness={readiness} />
+        <StatsModal stats={stats} readiness={readiness} passedTests={passed} totalTests={total} />
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <Stat value={stats.total_answers} label="Всего ответов" tone="text-brand-400" testid="stat-answers" />
         <Stat value={`${stats.accuracy}%`} label="Точность" tone="text-green-600" />
-        <Stat value={`${passed}/${officialTests.length || TEST_COUNT}`} label="Тестов сдано" tone="text-amber-600" />
+        <Stat value={`${passed}/${total}`} label="Тестов сдано" tone="text-amber-600" />
       </div>
 
       <div className="mt-6">
         <div className="mb-2 flex justify-between text-xs text-slate-400">
           <span>Прогресс</span>
-          <span>{Math.round((passed / total) * 100)}%</span>
+          <span>{readiness}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-100">
           <div className="h-full rounded-full bg-brand-500" style={{ width: `${(passed / total) * 100}%` }} />

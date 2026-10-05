@@ -15,6 +15,16 @@ export async function getTodayFreeTest(userId: string): Promise<number | null> {
   return rows[0]?.test_number ?? null;
 }
 
+/** Номера сданных официальных тестов (для повторного открытия free-пользователем) */
+export async function getPassedOfficialTests(userId: string): Promise<number[]> {
+  const db = await getDb();
+  const rows = await db.query<{ test_number: number }>(
+    `select test_number from test_progress where user_id = $1 and test_category = 'official' and passed`,
+    [userId],
+  );
+  return rows.map((r) => r.test_number);
+}
+
 /** Закрепляет выбор «сегодняшнего» бесплатного теста (идемпотентно) */
 async function claimTodayFreeTest(userId: string, n: number): Promise<void> {
   const db = await getDb();
@@ -27,7 +37,7 @@ async function claimTodayFreeTest(userId: string, n: number): Promise<void> {
 
 /** Вызывать сразу после успешной проверки canOpenTest — фиксирует бесплатный выбор дня, если он ещё не сделан */
 export async function registerFreeAccess(userId: string, category: TestCategory, n: number, acc: FreeAccess): Promise<void> {
-  if (category === 'official' && !acc.paid && n <= FREE_TEST_POOL && acc.todayFreeTest === null) {
+  if (category === 'official' && !acc.paid && n <= FREE_TEST_POOL && acc.todayFreeTest === null && !acc.passedTests?.includes(n)) {
     await claimTodayFreeTest(userId, n);
   }
 }

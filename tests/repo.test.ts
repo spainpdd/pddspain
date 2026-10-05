@@ -7,6 +7,7 @@ import { getStats } from '../lib/repo/users';
 import { recordPayment, grantDays, createClaim, revokeClaim } from '../lib/repo/billing';
 import { getProfile } from '../lib/repo/users';
 import { getQuestionOfDay } from '../lib/repo/content';
+import { getPassedOfficialTests } from '../lib/repo/progress';
 
 let db: Db;
 let ids: string[][];
@@ -26,6 +27,17 @@ describe('прохождение тестов', () => {
     const list = await listTests(u.id);
     expect(list.map((t) => t.status)).toEqual(['available', 'locked', 'locked', 'locked']);
     expect(list[0].playable).toBe(30);
+  });
+
+  it('getPassedOfficialTests: только сданные (≤2 ошибок), 3+ ошибок — не сдан, цвет по best_errors', async () => {
+    const u = await makeUser();
+    await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 1));
+    expect(await getPassedOfficialTests(u.id)).toEqual([1]);
+    await submitTest(u.id, 'official', 2, answersWithErrors(ids[1], 3));
+    expect(await getPassedOfficialTests(u.id)).toEqual([1]);
+    const list = await listTests(u.id);
+    expect(list[1]).toMatchObject({ status: 'available', best_errors: 3 });
+    expect(list[2].status).toBe('locked');
   });
 
   it('0 ошибок → тест сдан, открывается следующий, ошибок в разделе нет', async () => {

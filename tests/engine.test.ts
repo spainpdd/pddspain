@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   evaluateTest, computeStatuses, pickErrorBatch, extendAccess, decideClaim, dailyIndex,
-  madridDateKey, hasPaidAccess, canOpenTest, nextAfter, currentTest,
+  madridDateKey, hasPaidAccess, canOpenTest, nextAfter, currentTest, readinessPercent, errorTone,
 } from '../lib/engine';
 
 describe('evaluateTest', () => {
@@ -72,6 +72,27 @@ describe('доступ', () => {
     const picked5 = { paid: false, todayFreeTest: 5 };
     expect(canOpenTest('official', 5, picked5)).toBe(true);
     expect(canOpenTest('official', 7, picked5)).toBe(false);
+  });
+  it('canOpenTest: уже сданный тест free-пользователь открывает повторно, даже если сегодня начат другой', () => {
+    const acc = { paid: false, todayFreeTest: 3, passedTests: [1, 2] };
+    expect(canOpenTest('official', 1, acc)).toBe(true);
+    expect(canOpenTest('official', 3, acc)).toBe(true);
+    expect(canOpenTest('official', 4, acc)).toBe(false);
+  });
+  it('readinessPercent: сданные тесты к общему числу', () => {
+    expect(readinessPercent(1, 90)).toBe(1);
+    expect(readinessPercent(45, 90)).toBe(50);
+    expect(readinessPercent(90, 90)).toBe(100);
+    expect(readinessPercent(0, 90)).toBe(0);
+    expect(readinessPercent(5, 0)).toBe(0);
+  });
+  it('errorTone: цвет плитки по ошибкам', () => {
+    expect(errorTone(null)).toBe('none');
+    expect(errorTone(0)).toBe('perfect');
+    expect(errorTone(1)).toBe('one');
+    expect(errorTone(2)).toBe('two');
+    expect(errorTone(3)).toBe('bad');
+    expect(errorTone(9)).toBe('bad');
   });
   it('extendAccess: прибавляет к текущему сроку, а истёкший считает от сегодня', () => {
     expect(extendAccess('2026-10-01T10:00:00Z', 100, now).toISOString()).toBe('2027-01-09T10:00:00.000Z');
