@@ -122,6 +122,8 @@ describe('материалы «Полезно»', () => {
   let admin: Awaited<ReturnType<typeof upsertTelegramUser>>;
   beforeEach(async () => {
     db = await makeDb();
+    // стартовый гайд (миграция 008) не мешает проверкам пустого раздела
+    await db.exec('delete from useful_pages; delete from useful_sections;');
     admin = await upsertTelegramUser({ id: 1, first_name: 'Boss', username: 'boss' });
     admin = { ...admin, is_admin: true };
   });
