@@ -40,6 +40,7 @@ export interface LoginText {
   noBot: string;
   home: string;
   errGeneric: string;
+  errBlocked: string;
   errBad: string;
   errExpired: string;
   errNoToken: string;
@@ -118,6 +119,7 @@ export const LOGIN: Record<SiteLang, LoginText> = {
     noBot: 'Не задан NEXT_PUBLIC_TELEGRAM_BOT_USERNAME — кнопка Telegram недоступна.',
     home: 'На главную',
     errGeneric: 'Ошибка входа.',
+    errBlocked: 'Аккаунт заблокирован. Если это ошибка, напишите в поддержку.',
     errBad: 'Не удалось проверить вход через Telegram. Попробуйте ещё раз.',
     errExpired: 'Вход устарел. Попробуйте ещё раз.',
     errNoToken: 'Вход через Telegram не настроен на сервере (нет токена бота).',
@@ -139,6 +141,7 @@ export const LOGIN: Record<SiteLang, LoginText> = {
     noBot: 'NEXT_PUBLIC_TELEGRAM_BOT_USERNAME-ը նշված չէ. Telegram կոճակը հասանելի չէ։',
     home: 'Գլխավոր էջ',
     errGeneric: 'Մուտքի սխալ։',
+    errBlocked: 'Հաշիվը արգելափակված է։ Եթե դա սխալ է, դիմեք աջակցությանը։',
     errBad: 'Չհաջողվեց ստուգել Telegram-ով մուտքը։ Փորձեք կրկին։',
     errExpired: 'Մուտքի ժամկետը լրացել է։ Փորձեք կրկին։',
     errNoToken: 'Telegram-ով մուտքը սերվերում կարգավորված չէ (բոտի թոքեն չկա)։',

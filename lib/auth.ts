@@ -11,7 +11,9 @@ import type { Profile } from './types';
 /** Текущий пользователь (или null). Кэшируется в пределах одного запроса. */
 export const getSessionUser = cache(async (): Promise<Profile | null> => {
   const uid = verifySession(cookies().get(SESSION_COOKIE)?.value);
-  return uid ? getProfile(uid) : null;
+  if (!uid) return null;
+  const p = await getProfile(uid);
+  return p && !p.blocked_at ? p : null; // заблокированный пользователь = не вошёл
 });
 
 export async function requireUser(): Promise<Profile> {

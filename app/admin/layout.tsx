@@ -7,12 +7,14 @@ export const metadata = { title: 'Админка', robots: { index: false, follo
 
 const nav = [
   ['/admin', 'Обзор'],
+  ['/admin/users', 'Пользователи'],
+  ['/admin/payments', 'Платежи'],
+  ['/admin/claims', 'Гарантия'],
   ['/admin/questions', 'Вопросы'],
   ['/admin/topics', 'Темы'],
   ['/admin/tests', 'Тесты'],
-  ['/admin/users', 'Пользователи'],
-  ['/admin/claims', 'Гарантия'],
   ['/admin/pricing', 'Цены'],
+  ['/admin/audit', 'Журнал'],
   ['/admin/data', 'Импорт / экспорт'],
 ];
 

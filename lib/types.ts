@@ -54,6 +54,8 @@ export interface Profile {
   guarantee_eligible: boolean;
   exam_passed_at: string | null;
   created_at: string;
+  /** Заблокирован администратором (вход и доступ закрыты) */
+  blocked_at: string | null;
 }
 
 export type TestStatus = 'locked' | 'available' | 'passed';

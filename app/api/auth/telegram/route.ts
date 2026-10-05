@@ -16,6 +16,7 @@ export async function GET(req: Request) {
   if (!r.ok) return back(r.reason);
 
   const profile = await upsertTelegramUser(r.user);
+  if (profile.blocked_at) return back('blocked');
   const res = NextResponse.redirect(new URL('/dashboard', env.siteUrl));
   res.cookies.set(SESSION_COOKIE, signSession(profile.id), cookieOptions);
   return res;

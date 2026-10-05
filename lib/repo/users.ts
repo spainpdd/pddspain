@@ -3,7 +3,7 @@ import { env } from '../env';
 import type { Profile, StudyLang, TransLang } from '../types';
 
 export const PROFILE_COLS = `id, telegram_id, telegram_username, display_name, photo_url, study_lang, trans_lang,
-  auto_translate, notify, is_admin, access_until, guarantee_eligible, exam_passed_at, created_at`;
+  auto_translate, notify, is_admin, access_until, guarantee_eligible, exam_passed_at, created_at, blocked_at`;
 
 const iso = (v: unknown) => (v instanceof Date ? v.toISOString() : ((v as string | null) ?? null));
 
@@ -13,6 +13,7 @@ export function mapProfile(r: any): Profile {
     access_until: iso(r.access_until),
     exam_passed_at: iso(r.exam_passed_at),
     created_at: iso(r.created_at) as string,
+    blocked_at: iso(r.blocked_at),
   };
 }
 
@@ -153,7 +154,7 @@ export async function getStats(userId: string, q?: Queryable): Promise<Stats> {
 /** Одна-две вспомогательные выборки для бота/админки */
 export async function listNotifiable(): Promise<Profile[]> {
   const db = await getDb();
-  const rows = await db.query(`select ${PROFILE_COLS} from profiles where notify order by created_at`);
+  const rows = await db.query(`select ${PROFILE_COLS} from profiles where notify and blocked_at is null order by created_at`);
   return rows.map(mapProfile);
 }
 

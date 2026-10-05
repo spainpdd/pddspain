@@ -193,3 +193,19 @@ export async function notifyPaid(telegramId: number, until: string, tg: TgCall =
     reply_markup: openAppKeyboard('/test'),
   }).catch(() => {});
 }
+
+/** Уведомление о подарочном доступе от администратора */
+export async function notifyGift(telegramId: number, until: string, tg: TgCall = callTelegram): Promise<boolean> {
+  if (!env.botToken) return false;
+  try {
+    await tg('sendMessage', {
+      chat_id: telegramId,
+      parse_mode: 'HTML',
+      text: `🎁 Вам открыт доступ ко всем тестам до <b>${new Date(until).toLocaleDateString('ru-RU')}</b>. Удачи на экзамене!`,
+      reply_markup: openAppKeyboard('/test'),
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}

@@ -44,6 +44,9 @@ export default function TelegramBotLoginButton({ lang = 'ru' }: { lang?: SiteLan
         stopPolling();
         setStatus('confirmed');
         window.location.href = '/dashboard';
+      } else if (j.status === 'blocked') {
+        stopPolling();
+        window.location.href = '/login?error=blocked';
       } else if (j.status === 'expired') {
         stopPolling();
         setStatus('timeout');

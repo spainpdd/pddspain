@@ -1,6 +1,7 @@
 import { listClaims } from '@/lib/repo/admin';
 import { RevokeClaim } from '@/components/admin/SmallForms';
 import { formatDate } from '@/lib/utils';
+import Link from 'next/link';
 
 export default async function AdminClaims() {
   const claims = await listClaims();
@@ -14,7 +15,7 @@ export default async function AdminClaims() {
           <tbody>
             {claims.map((c: any) => (
               <tr key={c.id} className={`border-b border-slate-200/60 ${c.revoked ? 'opacity-40 line-through' : ''}`}>
-                <td className="p-3">{c.display_name}{c.telegram_username ? ` (@${c.telegram_username})` : ''}</td>
+                <td className="p-3"><Link href={`/admin/users/${c.user_id}`} className="text-brand-700 hover:underline">{c.display_name}{c.telegram_username ? ` (@${c.telegram_username})` : ''}</Link></td>
                 <td className="p-3">{formatDate(c.exam_date + 'T12:00:00Z')}</td>
                 <td className="p-3">{c.result === 'passed' ? 'сдал' : 'не сдал'}</td>
                 <td className="p-3">{c.days_added}</td>

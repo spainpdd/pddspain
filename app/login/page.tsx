@@ -22,6 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
     bad_hash: t.errBad,
     expired: t.errExpired,
     no_token: t.errNoToken,
+    blocked: t.errBlocked,
     no_hash: t.errBad,
     bad_data: t.errBad,
   };
