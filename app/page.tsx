@@ -7,6 +7,7 @@ import { formatPrice } from '@/lib/utils';
 import { getSiteLang } from '@/lib/site-lang';
 import { LANDING } from '@/lib/site-i18n';
 import LangSwitcher from '@/components/LangSwitcher';
+import { sellerLine } from '@/lib/seller';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +70,11 @@ export default async function Landing() {
       <footer className="mx-auto max-w-3xl px-5 pb-10 text-center text-xs leading-relaxed text-slate-400">
         {t.disclaimer}<br />
         <Link href="/legal" className="underline">{t.legal}</Link>
+        <span className="mx-1.5">·</span>
+        <Link href="/legal/offer" className="underline">{t.offer}</Link>
+        <span className="mx-1.5">·</span>
+        <Link href="/legal/privacy" className="underline">{t.privacy}</Link>
+        <p className="mt-24 text-[9px] leading-snug text-slate-300/80" data-testid="seller-info">{sellerLine()}</p>
       </footer>
     </div>
   );

@@ -22,6 +22,11 @@ const shot = async (page, name) => SHOTS && page.screenshot({ path: `${SHOTS}/${
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined, args: ['--no-sandbox'] });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, deviceScaleFactor: 2, locale: 'ru-RU' });
+await ctx.addInitScript(() => {
+  try {
+    localStorage.setItem('cookie_notice', '1'); // баннер cookie не перекрывает кнопки
+  } catch {}
+});
 const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));

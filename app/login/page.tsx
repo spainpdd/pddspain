@@ -54,6 +54,11 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
         )}
       </div>
 
+      <p className="mt-5 text-[11px] leading-relaxed text-slate-400" data-testid="login-agree">
+        {t.agree.pre} <Link href="/legal/privacy" className="underline">{t.agree.privacy}</Link> {t.agree.and}{' '}
+        <Link href="/legal/consent" className="underline">{t.agree.consent}</Link>
+      </p>
+
       {searchParams.error && <p className="mt-4 text-sm text-red-600" role="alert">{ERRORS[searchParams.error] ?? t.errGeneric}</p>}
 
       {env.devLogin && (

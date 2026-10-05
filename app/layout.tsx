@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PwaRegister from '@/components/PwaRegister';
+import CookieBanner from '@/components/CookieBanner';
 
 export const metadata: Metadata = {
   title: { default: 'DGT Права — подготовка к экзамену', template: '%s · DGT Права' },
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <PwaRegister />
+        <CookieBanner />
       </body>
     </html>
   );
