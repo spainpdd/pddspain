@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { accessInfo, requireUser } from '@/lib/auth';
-import { getTestQuestions, listTests } from '@/lib/repo/content';
+import { getCourse, getTestQuestions } from '@/lib/repo/content';
 import { registerFreeAccess } from '@/lib/repo/progress';
-import { canOpenTest, orderTests } from '@/lib/engine';
+import { canOpenTest } from '@/lib/engine';
 import { TEST_CATEGORIES, type TestCategory } from '@/lib/types';
 import TestPlayer from '@/components/TestPlayer';
 
@@ -15,21 +15,25 @@ export default async function TestPage({ params }: { params: { category: string;
   const n = Number(params.n);
   if (!Number.isInteger(n) || n < 1) notFound();
 
-  const tests = await listTests(user.id);
+  const { tests, checkpoints } = await getCourse(user.id);
   const item = tests.find((t) => t.category === category && t.number === n);
   if (!item) notFound();
   if (item.status === 'locked') redirect('/test');
   const acc = await accessInfo(user);
-  if (!canOpenTest(category, n, acc)) redirect('/pay');
-  await registerFreeAccess(user.id, category, n, acc);
+  if (!canOpenTest(item, acc)) redirect('/pay');
+  await registerFreeAccess(user.id, item, acc);
 
   const questions = await getTestQuestions(category, n);
   if (!questions.length) notFound();
 
-  // сквозная нумерация единого списка тестов (см. orderTests)
-  const ordered = orderTests(tests);
-  const idx = ordered.findIndex((t) => t.category === category && t.number === n);
-  const nxt = idx >= 0 ? ordered[idx + 1] : undefined;
+  // что идёт после этого теста: проверка (если стоит здесь и ещё не сдана) или следующий тест курса
+  const check = checkpoints.find((c) => c.milestone === item.display);
+  const nxt = tests[item.display]; // следующий по сквозному номеру
+  const after = check && check.status !== 'passed'
+    ? { kind: 'check' as const, milestone: check.milestone, final: check.kind === 'final' }
+    : nxt
+      ? { kind: 'test' as const, category: nxt.category, number: nxt.number, display: nxt.display }
+      : null;
 
   return (
     <TestPlayer
@@ -38,8 +42,8 @@ export default async function TestPage({ params }: { params: { category: string;
       testNumber={n}
       questions={questions}
       settings={{ study: user.study_lang, trans: user.trans_lang, auto: user.auto_translate }}
-      displayNumber={idx >= 0 ? ordered[idx].display : n}
-      nextTest={nxt ? { category: nxt.category, number: nxt.number, display: nxt.display } : null}
+      displayNumber={item.display}
+      after={after}
     />
   );
 }

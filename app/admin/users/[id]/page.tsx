@@ -4,7 +4,7 @@ import { getUserDetail, listAllTags, AUDIT_ACTIONS } from '@/lib/repo/admin-user
 import { requireAdmin } from '@/lib/auth';
 import { accessState, formatDateOnly, formatDateTime, formatMoneyCode, timeAgo, userLabel } from '@/lib/admin-format';
 import { AccessBadge, Badge, Bars, Empty, Stat } from '@/components/admin/ui';
-import { AccessPanel, AccountPanel, NotesPanel, TagsEditor } from '@/components/admin/UserPanels';
+import { AccessPanel, AccountPanel, CheckpointsPanel, NotesPanel, TagsEditor } from '@/components/admin/UserPanels';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,7 +59,7 @@ export default async function UserCard({ params }: { params: { id: string } }) {
         <Stat label="Ответов" value={d.stats.answers} />
         <Stat label="Точность" value={d.stats.answers ? `${d.stats.accuracy}%` : '—'} />
         <Stat label="Тестов сдано" value={d.stats.tests_passed} />
-        <Stat label="Ошибок открыто" value={d.stats.errors_open} tone={d.stats.errors_open ? 'warn' : undefined} />
+        <Stat label="Ошибок открыто" value={d.stats.errors_open} tone={d.stats.errors_open ? 'warn' : undefined} sub={d.stats.errors_pending > d.stats.errors_open ? `повторений: ${d.stats.errors_pending}` : undefined} />
         <Stat label="Ошибок исправлено" value={d.stats.errors_resolved} />
         <Stat label="Первый ответ" value={<span className="text-lg">{formatDateOnly(d.stats.first_answer_at)}</span>} sub={d.stats.last_answer_at ? `последний ${timeAgo(d.stats.last_answer_at)}` : undefined} />
       </div>
@@ -120,6 +120,28 @@ export default async function UserCard({ params }: { params: { id: string } }) {
           ) : <Empty>Заявок нет</Empty>}
         </section>
       </div>
+
+      <section className="card p-4" data-testid="checkpoints">
+        <h2 className="mb-3 font-semibold">Проверки (закрепление)</h2>
+        <CheckpointsPanel userId={u.id} items={d.checkpoints} />
+        {d.check_runs.length > 0 && (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-xs text-slate-500"><tr><th className="p-2">Проверка</th><th className="p-2">Итог</th><th className="p-2">Ошибок по тестам</th><th className="p-2">Когда</th></tr></thead>
+              <tbody>
+                {d.check_runs.map((r) => (
+                  <tr key={r.id} className="border-t border-slate-200/60">
+                    <td className="p-2">{r.kind === 'final' ? 'Финальная' : `После ${r.milestone}`}</td>
+                    <td className="p-2">{r.status === 'passed' ? <Badge tone="green">{r.by_admin ? 'засчитана админом' : 'сдана'}</Badge> : r.status === 'failed' ? <Badge tone="red">не сдана</Badge> : <Badge tone="amber">идёт</Badge>}</td>
+                    <td className="p-2 text-xs text-slate-600">{r.results ? r.results.map((x) => x.errors).join(' · ') : '—'}</td>
+                    <td className="p-2 text-xs text-slate-500">{timeAgo(r.finished_at ?? r.started_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <section className="card overflow-hidden">
         <h2 className="border-b border-slate-200 px-4 py-3 font-semibold">Прохождение тестов <span className="text-sm font-normal text-slate-400">({d.progress.length})</span></h2>

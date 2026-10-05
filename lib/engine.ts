@@ -1,15 +1,18 @@
 /**
  * Правила обучения — чистые функции без обращения к БД (легко тестировать).
  *
- *  • Тесты идут по порядку (1…90). Следующий открывается, когда предыдущий «сдан».
+ *  • Тесты идут одним курсом по порядку (1…N). Следующий открывается, когда предыдущий «сдан».
+ *  • После каждых 10 тестов — проверка («закрепление»): k+2 случайных теста из пройденных, по 30 минут
+ *    на тест, не больше 2 ошибок в каждом; пока она не сдана, следующий тест закрыт.
+ *    После последнего теста — финальная проверка из 15 случайных тестов.
  *  • 0 ошибок           → тест сдан, идём дальше.
  *  • 1–2 ошибки         → тест сдан; эти ошибки сразу даются на повторное решение
  *                          и одновременно сохраняются в раздел «Ошибки».
  *  • 3 и более ошибок   → тест НЕ сдан, следующий закрыт, пока не получится ≤ 2.
- *  • Раздел «Ошибки»    → выдаёт по 5 ранее ошибочных вопросов; верный ответ
- *                          в разделе убирает вопрос из очереди.
+ *  • Раздел «Ошибки»    → выдаёт по 5 ранее ошибочных вопросов. Каждая ошибка добавляет вопросу
+ *                          одно «повторение», верный ответ в разделе снимает одно.
  */
-import type { Choice, TestCategory, TestListItem } from './types';
+import type { Choice, TestCategory, TestListItem, TestStatus } from './types';
 
 export const TEST_COUNT = 90;
 export const TEST_SIZE = 30;
@@ -38,27 +41,89 @@ export function isPassed(errors: number): boolean {
 }
 
 /**
- * Статусы тестов по порядку. `numbers` — номера существующих (игровых) тестов
- * по возрастанию, `passed` — множество сданных.
- * Первый тест всегда доступен; каждый следующий — если предыдущий сдан.
+ * Статусы тестов курса. Тесты идут подряд 1…total (сквозной номер `display`).
+ * Тест открыт, если предыдущий сдан и — когда предыдущий был «контрольным» (кратен 10, не последний) —
+ * сдана проверка после него. Первый тест открыт всегда.
  */
-export function computeStatuses(
-  numbers: number[],
-  passed: Set<number>,
-): Map<number, 'locked' | 'available' | 'passed'> {
-  const out = new Map<number, 'locked' | 'available' | 'passed'>();
-  let prevPassed = true;
-  for (const n of numbers) {
-    if (passed.has(n)) out.set(n, 'passed');
-    else out.set(n, prevPassed ? 'available' : 'locked');
-    prevPassed = passed.has(n);
+export function computeCourseStatuses(total: number, passed: Set<number>, cleared: Set<number>): Map<number, TestStatus> {
+  const out = new Map<number, TestStatus>();
+  let open = true;
+  for (let d = 1; d <= total; d++) {
+    out.set(d, passed.has(d) ? 'passed' : open ? 'available' : 'locked');
+    open = passed.has(d) && (!isMidMilestone(d, total) || cleared.has(d));
   }
   return out;
 }
 
-/** Первый несданный доступный тест раздела «official» (для кнопки «Продолжить» на главной) */
-export function currentTest(list: Pick<TestListItem, 'category' | 'number' | 'status'>[]): number | null {
-  return list.find((t) => t.category === 'official' && t.status === 'available')?.number ?? null;
+// ---------------------------------------------------------------- проверки (закрепление)
+
+/** Через сколько тестов ставится промежуточная проверка */
+export const MID_STEP = 10;
+/** Сколько тестов в финальной проверке */
+export const FINAL_TESTS = 15;
+/** Минут на каждый тест проверки */
+export const CHECK_MINUTES = 30;
+
+export type CheckKind = 'mid' | 'final';
+export type CheckStatus = 'locked' | 'available' | 'passed';
+
+export interface Milestone {
+  /** после какого по счёту теста курса */
+  milestone: number;
+  kind: CheckKind;
+  /** сколько случайных тестов входит в проверку */
+  tests: number;
+}
+
+export function isMidMilestone(m: number, total: number): boolean {
+  return m > 0 && m < total && m % MID_STEP === 0;
+}
+
+/** Все проверки курса из `total` тестов: после 10, 20, … (3, 4, 5… теста) и финальная после последнего (15 тестов) */
+export function checkpointMilestones(total: number): Milestone[] {
+  const out: Milestone[] = [];
+  for (let m = MID_STEP; m < total; m += MID_STEP) out.push({ milestone: m, kind: 'mid', tests: m / MID_STEP + 2 });
+  if (total > 0) out.push({ milestone: total, kind: 'final', tests: FINAL_TESTS });
+  return out;
+}
+
+export interface CheckpointInfo extends Milestone {
+  status: CheckStatus;
+}
+
+/** Проверка доступна, когда сданы все тесты курса до неё включительно; сданной она остаётся навсегда */
+export function computeCheckpoints(total: number, passed: Set<number>, cleared: Set<number>): CheckpointInfo[] {
+  return checkpointMilestones(total).map((m) => {
+    let all = true;
+    for (let d = 1; d <= m.milestone && all; d++) all = passed.has(d);
+    return { ...m, status: cleared.has(m.milestone) ? 'passed' : all ? 'available' : 'locked' };
+  });
+}
+
+/** Бесплатно можно проверки в пределах бесплатного пула тестов, остальное — по подписке */
+export function canOpenCheckpoint(milestone: number, paid: boolean): boolean {
+  return paid || milestone <= FREE_TEST_POOL;
+}
+
+/** Случайные `n` разных элементов (частичный Фишер — Йейтс); `rnd` подставляется в тестах */
+export function pickRandom<T>(items: T[], n: number, rnd: () => number = Math.random): T[] {
+  const a = [...items];
+  const k = Math.min(Math.max(n, 0), a.length);
+  for (let i = 0; i < k; i++) {
+    const j = i + Math.floor(rnd() * (a.length - i));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, k);
+}
+
+/** Проверка сдана, если в КАЖДОМ тесте не больше MAX_ERRORS ошибок (неотвеченные считаются ошибками) */
+export function checkpointPassed(results: { errors: number }[]): boolean {
+  return results.length > 0 && results.every((r) => r.errors <= MAX_ERRORS);
+}
+
+/** Первый несданный открытый тест курса (для кнопки «Продолжить» на главной) */
+export function currentTest<T extends Pick<TestListItem, 'status'>>(list: T[]): T | null {
+  return list.find((t) => t.status === 'available') ?? null;
 }
 
 /**
@@ -71,25 +136,23 @@ export function orderTests<T extends { category: TestCategory; number: number }>
   return [...byCat('official'), ...byCat('mixed')].map((t, i) => ({ ...t, display: i + 1 }));
 }
 
-/** Следующий по порядку тест после n (если он существует) */
-export function nextAfter(numbers: number[], n: number): number | null {
-  const i = numbers.indexOf(n);
-  return i >= 0 && i + 1 < numbers.length ? numbers[i + 1] : null;
-}
-
 export interface ErrorRow {
   question_id: string;
   times_wrong: number;
+  /** сколько повторений ещё нужно (по умолчанию 1) */
+  pending?: number;
   last_seen_at: string | Date;
 }
 
-/** Порядок выдачи ошибок: давно не показывали → раньше; при равенстве — чаще ошибался → раньше */
+/** Порядок выдачи ошибок: давно не показывали → раньше; при равенстве — больше повторений, затем чаще ошибался */
 export function pickErrorBatch<T extends ErrorRow>(rows: T[], size = ERRORS_BATCH): T[] {
   return [...rows]
     .sort((a, b) => {
       const ta = new Date(a.last_seen_at).getTime();
       const tb = new Date(b.last_seen_at).getTime();
       if (ta !== tb) return ta - tb;
+      const pa = a.pending ?? 1, pb = b.pending ?? 1;
+      if (pa !== pb) return pb - pa;
       return b.times_wrong - a.times_wrong;
     })
     .slice(0, size);
@@ -104,26 +167,22 @@ export function hasPaidAccess(accessUntil: string | Date | null | undefined, now
 
 export interface FreeAccess {
   paid: boolean;
-  /** Номер нового (ещё не сданного) теста, который пользователь уже начал сегодня (null — ещё нет) */
+  /** Сквозной номер нового (ещё не сданного) теста, который пользователь уже начал сегодня (null — ещё нет) */
   todayFreeTest: number | null;
-  /** Уже сданные официальные тесты — их можно открывать повторно без ограничений дня */
-  passedTests?: number[];
 }
 
 /**
- * Можно ли открыть тест n (порядок «по очереди» задаёт computeStatuses — это про оплату).
- *  • «mixed»        — без платного доступа, всегда открыт.
+ * Можно ли открыть тест курса (порядок «по очереди» задаёт computeCourseStatuses).
  *  • платный доступ — открыто всё, что открыто по очереди.
  *  • иначе          — бесплатно только тесты 1…FREE_TEST_POOL: уже сданные — всегда
  *                      (повторение), а новый — один в день (тот, что начат сегодня,
  *                      либо ещё не начатый).
  */
-export function canOpenTest(category: TestCategory, n: number, acc: FreeAccess): boolean {
-  if (category === 'mixed') return true;
+export function canOpenTest(t: { display: number; status: TestStatus }, acc: FreeAccess): boolean {
   if (acc.paid) return true;
-  if (n > FREE_TEST_POOL) return false;
-  if (acc.passedTests?.includes(n)) return true;
-  return acc.todayFreeTest === null || acc.todayFreeTest === n;
+  if (t.display > FREE_TEST_POOL) return false;
+  if (t.status === 'passed') return true;
+  return acc.todayFreeTest === null || acc.todayFreeTest === t.display;
 }
 
 /** «Готовность к экзамену»: доля сданных тестов от их общего числа, 0…100 */

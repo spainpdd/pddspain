@@ -13,6 +13,7 @@ const nav = [
   ['/admin/questions', 'Вопросы'],
   ['/admin/topics', 'Темы'],
   ['/admin/tests', 'Тесты'],
+  ['/admin/useful', 'Полезно'],
   ['/admin/pricing', 'Цены'],
   ['/admin/audit', 'Журнал'],
   ['/admin/data', 'Импорт / экспорт'],

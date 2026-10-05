@@ -7,7 +7,6 @@ import { getStats } from '../lib/repo/users';
 import { recordPayment, grantDays, createClaim, revokeClaim } from '../lib/repo/billing';
 import { getProfile } from '../lib/repo/users';
 import { getQuestionOfDay } from '../lib/repo/content';
-import { getPassedOfficialTests } from '../lib/repo/progress';
 
 let db: Db;
 let ids: string[][];
@@ -29,13 +28,12 @@ describe('прохождение тестов', () => {
     expect(list[0].playable).toBe(30);
   });
 
-  it('getPassedOfficialTests: только сданные (≤2 ошибок), 3+ ошибок — не сдан, цвет по best_errors', async () => {
+  it('сдан только тест с ≤2 ошибками, 3+ ошибок — не сдан, цвет по best_errors', async () => {
     const u = await makeUser();
     await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 1));
-    expect(await getPassedOfficialTests(u.id)).toEqual([1]);
     await submitTest(u.id, 'official', 2, answersWithErrors(ids[1], 3));
-    expect(await getPassedOfficialTests(u.id)).toEqual([1]);
     const list = await listTests(u.id);
+    expect(list.map((t) => t.status)).toEqual(['passed', 'available', 'locked', 'locked']);
     expect(list[1]).toMatchObject({ status: 'available', best_errors: 3 });
     expect(list[2].status).toBe('locked');
   });
@@ -43,7 +41,7 @@ describe('прохождение тестов', () => {
   it('0 ошибок → тест сдан, открывается следующий, ошибок в разделе нет', async () => {
     const u = await makeUser();
     const r = await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 0));
-    expect(r).toMatchObject({ errors: 0, outcome: 'perfect', passed: true, nextTest: 2, wrongIds: [] });
+    expect(r).toMatchObject({ errors: 0, outcome: 'perfect', passed: true, wrongIds: [] });
     expect((await listTests(u.id)).map((t) => t.status)).toEqual(['passed', 'available', 'locked', 'locked']);
     expect((await getStats(u.id)).errors_open).toBe(0);
   });
@@ -51,7 +49,7 @@ describe('прохождение тестов', () => {
   it('2 ошибки → сдан, ошибки сохранены в раздел «Ошибки», следующий открыт', async () => {
     const u = await makeUser();
     const r = await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 2));
-    expect(r).toMatchObject({ errors: 2, outcome: 'pass_review', passed: true, nextTest: 2 });
+    expect(r).toMatchObject({ errors: 2, outcome: 'pass_review', passed: true });
     expect(r.wrongIds).toEqual([ids[0][0], ids[0][1]]);
     const st = await getStats(u.id);
     expect(st.errors_open).toBe(2);
@@ -62,12 +60,12 @@ describe('прохождение тестов', () => {
   it('3 ошибки → тест не сдан, следующий закрыт; пересдача с ≤2 открывает', async () => {
     const u = await makeUser();
     const r1 = await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 3));
-    expect(r1).toMatchObject({ errors: 3, outcome: 'fail', passed: false, nextTest: null });
+    expect(r1).toMatchObject({ errors: 3, outcome: 'fail', passed: false });
     expect((await listTests(u.id))[1].status).toBe('locked');
     await expect(submitTest(u.id, 'official', 2, answersWithErrors(ids[1], 0))).rejects.toMatchObject({ code: 'locked' });
 
     const r2 = await submitTest(u.id, 'official', 1, answersWithErrors(ids[0], 2));
-    expect(r2).toMatchObject({ outcome: 'pass_review', passed: true, nextTest: 2 });
+    expect(r2).toMatchObject({ outcome: 'pass_review', passed: true });
     const l = await listTests(u.id);
     expect(l[0]).toMatchObject({ status: 'passed', attempts: 2, best_errors: 2, last_errors: 2 });
     expect(l[1].status).toBe('available');
@@ -116,7 +114,7 @@ describe('раздел «Ошибки»', () => {
     // 3 верно, 2 неверно
     const ans = Object.fromEntries(batch.map((q, i) => [q.id, i < 3 ? 'a' : 'b']));
     const r = await submitErrors(u.id, ans);
-    expect(r).toEqual({ correct: 3, wrong: 2, remaining: 5 });
+    expect(r).toEqual({ correct: 3, wrong: 2, remaining: 7, questions: 5 }); // 8 − 3 верных + 2 неверных
 
     // следующая пачка не начинается с только что решённых: сначала те, что ещё не показывались
     const next = await getErrorBatch(u.id);
@@ -130,7 +128,7 @@ describe('раздел «Ошибки»', () => {
   it('чужой/не из очереди вопрос не принимается', async () => {
     const u = await makeUser();
     const r = await submitErrors(u.id, { [ids[0][0]]: 'a' });
-    expect(r).toEqual({ correct: 0, wrong: 0, remaining: 0 });
+    expect(r).toEqual({ correct: 0, wrong: 0, remaining: 0, questions: 0 });
   });
 
   it('повторная ошибка в тесте возвращает решённый вопрос в очередь', async () => {

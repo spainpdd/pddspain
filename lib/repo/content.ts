@@ -1,6 +1,6 @@
 import { getDb, type Queryable } from '../db';
 import { env } from '../env';
-import { computeStatuses, dailyIndex, FREE_TEST_POOL } from '../engine';
+import { computeCheckpoints, computeCourseStatuses, dailyIndex, FREE_TEST_POOL, orderTests, type CheckpointInfo } from '../engine';
 import type { Content, Lang, PlayerQuestion, TestCategory, TestListItem } from '../types';
 
 export async function loadPlayerQuestions(
@@ -37,66 +37,66 @@ export async function loadPlayerQuestions(
   }));
 }
 
+export interface Course {
+  /** тесты курса по порядку (официальные, затем дополнительные), у каждого сквозной номер display */
+  tests: TestListItem[];
+  /** проверки: после каждых 10 тестов и финальная */
+  checkpoints: CheckpointInfo[];
+}
+
 /**
- * Список игровых тестов (в которых есть хотя бы один доступный вопрос) + статус для пользователя.
- * Два независимых раздела (TestCategory): «official» — основной платный тренажёр с разблокировкой
- * по порядку и правами (unverified скрыт, если не включён SERVE_UNVERIFIED_QUESTIONS); «mixed» —
- * дополнительные тесты из сторонних источников: без ограничений прав, без блокировки по порядку,
- * без платного доступа — видны и доступны всем прямо со статусом unverified.
+ * Курс пользователя: единая последовательность игровых тестов (в которых есть хотя бы один доступный вопрос)
+ * и проверки между ними. Порядок: сначала «official» (права проверяются: unverified скрыт, если не включён
+ * SERVE_UNVERIFIED_QUESTIONS), затем «mixed» (дополнительные из сторонних источников, видны со статусом unverified);
+ * внутри — по номеру. Тест открывается, когда сдан предыдущий и сдана проверка, если она стоит между ними.
  */
-export async function listTests(userId: string, q?: Queryable): Promise<TestListItem[]> {
+export async function getCourse(userId: string, q?: Queryable): Promise<Course> {
   const db = q ?? (await getDb());
-  const tests = await db.query<{ category: TestCategory; number: number; playable: number }>(
+  const rows = await db.query<{ category: TestCategory; number: number; playable: number }>(
     `select t.category, t.number, count(qs.id)::int as playable
        from tests t
        join test_questions tq on tq.test_category = t.category and tq.test_number = t.number
        join questions qs on qs.id = tq.question_id and qs.is_active
          and (qs.rights_status <> 'unverified' or $1 or t.category = 'mixed')
       where t.is_active
-      group by t.category, t.number
-      order by t.category, t.number`,
+      group by t.category, t.number`,
     [env.serveUnverified],
   );
+  const ordered = orderTests(rows);
   const prog = await db.query(
     `select test_category, test_number, attempts, best_errors, last_errors, passed from test_progress where user_id = $1`,
     [userId],
   );
   const pm = new Map(prog.map((p: any) => [`${p.test_category}:${p.test_number}`, p]));
-  const passedByCat = new Map<TestCategory, Set<number>>();
-  for (const p of prog as any[]) {
-    if (!p.passed) continue;
-    const s = passedByCat.get(p.test_category) ?? new Set<number>();
-    s.add(p.test_number);
-    passedByCat.set(p.test_category, s);
-  }
-  const numbersByCat = new Map<TestCategory, number[]>();
-  for (const t of tests) numbersByCat.set(t.category, [...(numbersByCat.get(t.category) ?? []), t.number]);
-  const statusByCat = new Map<TestCategory, Map<number, 'locked' | 'available' | 'passed'>>();
-  for (const [cat, nums] of numbersByCat) {
-    // «mixed» — без блокировки по порядку: всё сразу доступно
-    statusByCat.set(
-      cat,
-      cat === 'mixed'
-        ? new Map(nums.map((n): [number, 'passed' | 'available'] => [n, passedByCat.get(cat)?.has(n) ? 'passed' : 'available']))
-        : computeStatuses(nums, passedByCat.get(cat) ?? new Set()),
-    );
-  }
-  return tests.map((t) => {
+  const passed = new Set<number>();
+  for (const t of ordered) if ((pm.get(`${t.category}:${t.number}`) as any)?.passed) passed.add(t.display);
+  const cleared = new Set<number>(
+    (await db.query<{ milestone: number }>(`select distinct milestone from checkpoint_runs where user_id = $1 and status = 'passed'`, [userId])).map(
+      (r) => r.milestone,
+    ),
+  );
+  const statuses = computeCourseStatuses(ordered.length, passed, cleared);
+  const tests: TestListItem[] = ordered.map((t) => {
     const p: any = pm.get(`${t.category}:${t.number}`);
-    const passedOfficial = passedByCat.get('official') ?? new Set<number>();
-    const st = statusByCat.get(t.category)!.get(t.number)!;
+    const st = statuses.get(t.display)!;
     return {
       category: t.category,
       number: t.number,
+      display: t.display,
       playable: t.playable,
-      status: t.category === 'official' && env.unlockAllTests && !passedOfficial.has(t.number) ? 'available' : st,
+      status: env.unlockAllTests && st === 'locked' ? 'available' : st,
       attempts: p?.attempts ?? 0,
       best_errors: p?.best_errors ?? null,
       last_errors: p?.last_errors ?? null,
-      // «mixed» — без платного доступа, бесплатны все; «official» — в пуле «1 бесплатный тест в день»
-      free: t.category === 'mixed' ? true : t.number <= FREE_TEST_POOL,
+      // бесплатный пул — первые FREE_TEST_POOL тестов курса
+      free: t.display <= FREE_TEST_POOL,
     };
   });
+  return { tests, checkpoints: computeCheckpoints(tests.length, passed, cleared) };
+}
+
+export async function listTests(userId: string, q?: Queryable): Promise<TestListItem[]> {
+  return (await getCourse(userId, q)).tests;
 }
 
 export async function getTestQuestions(category: TestCategory, testNumber: number, q?: Queryable): Promise<PlayerQuestion[]> {

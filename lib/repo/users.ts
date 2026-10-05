@@ -85,6 +85,8 @@ export interface Stats {
   today_answers: number;
   today_correct: number;
   errors_open: number;
+  /** сколько повторений осталось в разделе «Ошибки» (каждая ошибка = +1, верный ответ = −1) */
+  errors_pending: number;
   errors_resolved: number;
   distinct_questions: number;
   accuracy: number; // % за всё время
@@ -106,8 +108,9 @@ export async function getStats(userId: string, q?: Queryable): Promise<Stats> {
          (select count(*)::int from answer_log where user_id = $1 and correct
                                                 and created_at >= ${TODAY_START})                   as today_correct,
          (select count(distinct question_id)::int from answer_log where user_id = $1)                as distinct_questions,
-         (select count(*)::int from user_errors where user_id = $1 and not resolved)                as errors_open,
-         (select count(*)::int from user_errors where user_id = $1 and resolved)                    as errors_resolved`,
+         (select count(*)::int from user_errors where user_id = $1 and pending > 0)                 as errors_open,
+         (select coalesce(sum(pending), 0)::int from user_errors where user_id = $1 and pending > 0) as errors_pending,
+         (select count(*)::int from user_errors where user_id = $1 and pending = 0)                 as errors_resolved`,
       [userId],
     ),
     db.query<{ correct: boolean }>(
@@ -165,5 +168,5 @@ export async function setNotify(userId: string, notify: boolean) {
 
 export async function countOpenErrors(userId: string): Promise<number> {
   const db = await getDb();
-  return (await db.query('select count(*)::int as n from user_errors where user_id = $1 and not resolved', [userId]))[0].n;
+  return (await db.query('select coalesce(sum(pending), 0)::int as n from user_errors where user_id = $1 and pending > 0', [userId]))[0].n;
 }

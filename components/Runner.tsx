@@ -30,6 +30,11 @@ interface Props {
   /** Ключ localStorage для сохранения хода (обновление страницы не теряет ответы) */
   persistKey?: string;
   finishLabel?: string;
+  /** Режим проверки: без подсказок и пояснений, ответ можно поменять до «Далее» */
+  blind?: boolean;
+  /** Момент (мс, Date.now()), когда время теста выходит; по истечении вызывается onTimeUp с текущими ответами */
+  deadlineAt?: number;
+  onTimeUp?: (answers: AnswerMap) => void;
 }
 
 interface Saved {
@@ -47,6 +52,20 @@ function loadSaved(key: string | undefined, ids: string[]): Saved | null {
   return null;
 }
 
+/** Сохранённые ответы хода (для случая, когда время вышло, пока пользователь был вне экрана) */
+export function loadSavedAnswers(key: string): AnswerMap {
+  try {
+    return (JSON.parse(localStorage.getItem(key) || 'null') as Saved | null)?.answers ?? {};
+  } catch {
+    return {};
+  }
+}
+
+export function formatClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
 export function clearSaved(key: string | undefined) {
   if (!key) return;
   try {
@@ -54,12 +73,24 @@ export function clearSaved(key: string | undefined) {
   } catch {}
 }
 
-export default function Runner({ questions, lang, onLang, onFinish, onExit, countErrors, label, persistKey, finishLabel }: Props) {
+export default function Runner({ questions, lang, onLang, onFinish, onExit, countErrors, label, persistKey, finishLabel, blind, deadlineAt, onTimeUp }: Props) {
   const ids = useMemo(() => questions.map((q) => q.id), [questions]);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [idx, setIdx] = useState(0);
   const [ready, setReady] = useState(false);
   const explRef = useRef<HTMLDivElement>(null);
+  const answersRef = useRef<AnswerMap>({});
+  answersRef.current = answers;
+  const firedRef = useRef(false);
+  const [now, setNow] = useState(() => Date.now());
+
+  // таймер теста (режим проверки)
+  useEffect(() => {
+    if (!deadlineAt) return;
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [deadlineAt]);
 
   // восстановление хода после обновления страницы
   useEffect(() => {
@@ -85,12 +116,19 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
 
   const choose = useCallback(
     (c: Choice) => {
-      if (!q || answers[q.id] || !choicesOf(q).includes(c)) return;
+      if (!q || (!blind && answers[q.id]) || !choicesOf(q).includes(c)) return;
       setAnswers((a) => ({ ...a, [q.id]: c }));
-      setTimeout(() => explRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+      if (!blind) setTimeout(() => explRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
     },
-    [q, answers],
+    [q, answers, blind],
   );
+
+  // время вышло — завершаем текущий тест с тем, что успели ответить
+  useEffect(() => {
+    if (!deadlineAt || !ready || firedRef.current || now < deadlineAt) return;
+    firedRef.current = true;
+    onTimeUp?.(answersRef.current);
+  }, [deadlineAt, ready, now, onTimeUp]);
 
   const next = useCallback(() => {
     if (!q || !answers[q.id]) return;
@@ -121,6 +159,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
   const tr = lang.showTrans ? q.i18n[trans] ?? null : null;
   const missingTr = lang.showTrans && !q.i18n[trans];
   const pct = ((idx + (chosen ? 1 : 0)) / questions.length) * 100;
+  const remaining = deadlineAt ? Math.max(0, deadlineAt - now) : null;
 
   const chip = (active: boolean) =>
     cn('chip', active ? 'bg-brand-600 text-white' : 'bg-white text-slate-500 hover:text-slate-900');
@@ -169,7 +208,12 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
           </div>
           <div className="flex items-center gap-2 text-xs">
             {label && <span className="text-slate-500">{label}</span>}
-            {countErrors && (
+            {remaining !== null && (
+              <span className={cn('rounded-full px-2 py-1 font-semibold tabular-nums', remaining < 5 * 60_000 ? 'bg-red-500/15 text-red-700' : 'bg-slate-100 text-slate-600')} data-testid="timer">
+                {formatClock(remaining)}
+              </span>
+            )}
+            {countErrors && !blind && (
               <span className={cn('rounded-full px-2 py-1 font-semibold', wrongSoFar > MAX_ERRORS ? 'bg-red-500/15 text-red-700' : wrongSoFar ? 'bg-amber-500/15 text-amber-700' : 'bg-slate-100 text-slate-500')} data-testid="err-chip">
                 Ошибок: {wrongSoFar}
               </span>
@@ -198,7 +242,8 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
             {choicesOf(q).map((c) => {
               const isChosen = chosen === c;
               const isRight = q.correct === c;
-              const done = !!chosen;
+              const done = !!chosen && !blind;
+              const picked = blind && isChosen;
               return (
                 <button
                   key={c}
@@ -208,7 +253,8 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
                   data-state={done ? (isRight ? 'right' : isChosen ? 'wrong' : 'idle') : 'idle'}
                   className={cn(
                     'flex w-full items-start gap-3 rounded-2xl border-2 px-3.5 py-3.5 text-left transition active:scale-[0.99]',
-                    !done && 'border-slate-200 bg-ink-900 hover:border-brand-500',
+                    !done && !picked && 'border-slate-200 bg-ink-900 hover:border-brand-500',
+                    picked && 'border-brand-500 bg-brand-500/10',
                     done && isRight && 'border-green-500 bg-green-500/15',
                     done && isChosen && !isRight && 'border-red-500 bg-red-500/15',
                     done && !isChosen && !isRight && 'border-slate-200/70 bg-ink-900/40 opacity-60',
@@ -217,7 +263,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
                   <span
                     className={cn(
                       'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                      done && isRight ? 'bg-green-500 text-white' : done && isChosen ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500',
+                      done && isRight ? 'bg-green-500 text-white' : done && isChosen ? 'bg-red-500 text-white' : picked ? 'bg-brand-500 text-white' : 'bg-slate-100 text-slate-500',
                     )}
                   >
                     {done && isRight ? <Check size={16} strokeWidth={3} /> : c.toUpperCase()}
@@ -231,7 +277,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
             })}
           </div>
 
-          {q.official && (
+          {q.official && !blind && (
             <p className="mt-4 text-[11px] leading-snug text-slate-500" data-testid="source-dgt">
               Fuente: {DGT_SOURCE_NAME} ·{' '}
               <a href={DGT_SITE} target="_blank" rel="noopener noreferrer" className="underline">sede.dgt.gob.es</a>
@@ -240,7 +286,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
           )}
 
           {/* пояснение открывается сразу после выбора ответа */}
-          {chosen && (
+          {chosen && !blind && (
             <div ref={explRef} className="rise mt-5 rounded-2xl border border-slate-200 bg-ink-800 p-4" data-testid="explanation">
               <p className={cn('mb-1.5 text-sm font-semibold', chosen === q.correct ? 'text-green-600' : 'text-red-600')}>
                 {chosen === q.correct ? 'Верно' : `Неверно · правильный ответ ${q.correct.toUpperCase()}`}

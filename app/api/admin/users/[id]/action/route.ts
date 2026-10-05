@@ -1,7 +1,7 @@
 import { adminRoute } from '@/lib/admin-api';
 import { fail, json, readJson } from '@/lib/api';
 import {
-  adminAddNote, adminBlock, adminDeleteNote, adminEndAccess, adminGrantDays, adminSetAccessUntil, adminSetAdmin, adminSetTags,
+  adminAddNote, adminBlock, adminClearCheckpoint, adminDeleteNote, adminEndAccess, adminGrantDays, adminSetAccessUntil, adminSetAdmin, adminSetTags,
 } from '@/lib/repo/admin-users';
 import { notifyGift } from '@/lib/bot';
 
@@ -38,6 +38,9 @@ export const POST = (req: Request, { params }: { params: { id: string } }) =>
         return json({ ok: true });
       case 'unblock':
         await adminBlock(admin, id, false);
+        return json({ ok: true });
+      case 'check_clear':
+        await adminClearCheckpoint(admin, id, Number(b.milestone));
         return json({ ok: true });
       case 'tags':
         return json({ ok: true, tags: await adminSetTags(admin, id, b.tags) });

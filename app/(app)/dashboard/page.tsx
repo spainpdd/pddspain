@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { ArrowRight, Lock } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
-import { listTests } from '@/lib/repo/content';
+import { getCourse } from '@/lib/repo/content';
 import { getPricing } from '@/lib/repo/config';
 import { getDisplayCurrency } from '@/lib/site-currency';
-import { TEST_COUNT, currentTest, canOpenTest, readinessPercent } from '@/lib/engine';
+import { TEST_COUNT, currentTest, canOpenTest, canOpenCheckpoint, readinessPercent } from '@/lib/engine';
 import InstallHint from '@/components/InstallHint';
 import StatsModal from '@/components/StatsModal';
 import { formatDate, formatPrice, plural } from '@/lib/utils';
@@ -14,12 +14,14 @@ export const metadata = { title: 'Главная' };
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [stats, tests, acc, pricing] = await Promise.all([getStats(user.id), listTests(user.id), accessInfo(user), getPricing()]);
-  const officialTests = tests.filter((t) => t.category === 'official');
-  const passed = officialTests.filter((t) => t.status === 'passed').length;
-  const total = Math.max(officialTests.length, TEST_COUNT);
+  const [stats, course, acc, pricing] = await Promise.all([getStats(user.id), getCourse(user.id), accessInfo(user), getPricing()]);
+  const tests = course.tests;
+  const passed = tests.filter((t) => t.status === 'passed').length;
+  const total = tests.length || TEST_COUNT;
   const cur = currentTest(tests);
-  const curAllowed = cur ? canOpenTest('official', cur, acc) : true;
+  const curAllowed = cur ? canOpenTest(cur, acc) : true;
+  // ближайшая непройденная проверка: когда сданы все тесты до неё — предлагаем её вместо следующего теста
+  const check = course.checkpoints.find((c) => c.status === 'available');
   const readiness = readinessPercent(passed, total);
   const priceText = formatPrice(pricing, getDisplayCurrency(user.trans_lang));
 
@@ -57,12 +59,22 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-6 space-y-3">
-        {officialTests.length === 0 ? (
+        {tests.length === 0 ? (
           <div className="card p-5 text-sm text-slate-400">Тесты ещё не добавлены. Загляните позже.</div>
+        ) : check && !cur ? (
+          canOpenCheckpoint(check.milestone, acc.paid) ? (
+            <Link href={`/test/check/${check.milestone}`} className="btn btn-primary w-full text-lg" data-testid="cta-check">
+              {check.kind === 'final' ? 'Финальная проверка' : 'Пройти проверку'} <ArrowRight size={20} />
+            </Link>
+          ) : (
+            <Link href="/pay" className="btn btn-primary w-full text-lg">
+              <Lock size={18} /> Открыть все тесты
+            </Link>
+          )
         ) : cur ? (
           curAllowed ? (
-            <Link href={`/test/official/${cur}`} className="btn btn-primary w-full text-lg" data-testid="cta-continue">
-              {passed ? `Продолжить: тест ${cur}` : `Начать: тест ${cur}`} <ArrowRight size={20} />
+            <Link href={`/test/${cur.category}/${cur.number}`} className="btn btn-primary w-full text-lg" data-testid="cta-continue">
+              {passed ? `Продолжить: тест ${cur.display}` : `Начать: тест ${cur.display}`} <ArrowRight size={20} />
             </Link>
           ) : (
             <Link href="/pay" className="btn btn-primary w-full text-lg">
@@ -78,8 +90,8 @@ export default async function DashboardPage() {
             <div className="font-medium">Раздел ошибок</div>
             <div className="text-xs text-slate-400">По 5 вопросов, в которых вы ошибались</div>
           </div>
-          <span className={stats.errors_open ? 'rounded-full bg-red-500/15 px-3 py-1 text-sm font-semibold text-red-700' : 'text-sm text-slate-500'}>
-            {stats.errors_open}
+          <span className={stats.errors_pending ? 'rounded-full bg-red-500/15 px-3 py-1 text-sm font-semibold text-red-700' : 'text-sm text-slate-500'} data-testid="errors-pending">
+            {stats.errors_pending}
           </span>
         </Link>
       </div>

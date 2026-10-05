@@ -208,3 +208,28 @@ export function NotesPanel({ userId, notes }: { userId: string; notes: { id: num
     </section>
   );
 }
+
+// ------------------------------------------------------------------ проверки (закрепление)
+
+export function CheckpointsPanel({ userId, items }: { userId: string; items: { milestone: number; kind: 'mid' | 'final'; tests: number; status: 'locked' | 'available' | 'passed' }[] }) {
+  const { busy, msg, run } = useAction(userId);
+  const label = { locked: 'не открыта', available: 'доступна', passed: 'сдана' } as const;
+  const tone = { locked: 'bg-slate-100 text-slate-500', available: 'bg-amber-100 text-amber-800', passed: 'bg-green-100 text-green-800' } as const;
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2">
+        {items.map((c) => (
+          <div key={c.milestone} className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm" data-testid={`cp-${c.milestone}`}>
+            <span className="font-medium">{c.kind === 'final' ? 'Финал' : `После ${c.milestone}`}</span>
+            <span className="text-xs text-slate-400">{c.tests} тестов</span>
+            <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${tone[c.status]}`}>{label[c.status]}</span>
+            {c.status !== 'passed' && (
+              <Confirm label="Засчитать" busy={busy} onYes={() => run({ type: 'check_clear', milestone: c.milestone }, () => 'Проверка засчитана')} />
+            )}
+          </div>
+        ))}
+      </div>
+      <Msg m={msg} />
+    </div>
+  );
+}

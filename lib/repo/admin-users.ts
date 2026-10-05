@@ -1,4 +1,5 @@
 import { getDb, type Queryable } from '../db';
+import { getCourse } from './content';
 import { ValidationError } from './admin';
 import { mapProfile, PROFILE_COLS } from './users';
 import type { Profile } from '../types';
@@ -122,7 +123,7 @@ export async function exportUsers(o: UserListOpts = {}) {
 
 export interface UserDetail {
   user: Profile & { tags: string[]; last_seen_at: string | null; blocked_reason: string | null };
-  stats: { answers: number; correct: number; accuracy: number; tests_passed: number; errors_open: number; errors_resolved: number; first_answer_at: string | null; last_answer_at: string | null };
+  stats: { answers: number; correct: number; accuracy: number; tests_passed: number; errors_open: number; errors_pending: number; errors_resolved: number; first_answer_at: string | null; last_answer_at: string | null };
   daily: { d: string; n: number; ok: number }[];
   progress: { category: string; number: number; attempts: number; best_errors: number | null; last_errors: number | null; passed: boolean; last_attempt_at: string | null }[];
   payments: { id: string; ref: string; amount_cents: number; currency: string; days_granted: number; created_at: string; is_test: boolean | null }[];
@@ -130,6 +131,8 @@ export interface UserDetail {
   claims: { id: string; exam_date: string; result: string; days_added: number; revoked: boolean; created_at: string }[];
   notes: { id: number; author_name: string | null; body: string; created_at: string }[];
   audit: AuditRow[];
+  checkpoints: { milestone: number; kind: 'mid' | 'final'; tests: number; status: 'locked' | 'available' | 'passed' }[];
+  check_runs: { id: string; milestone: number; kind: string; status: string; by_admin: boolean; started_at: string; finished_at: string | null; results: { display: number; errors: number; total: number }[] | null }[];
   recent: { question_id: string; context: string; correct: boolean; chosen: string; created_at: string; topic: string | null }[];
 }
 
@@ -181,7 +184,7 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
   ]);
   const errs = (
     await db.query(
-      `select count(*) filter (where not resolved)::int as open, count(*) filter (where resolved)::int as done from user_errors where user_id = $1`,
+      `select count(*) filter (where pending > 0)::int as open, coalesce(sum(pending), 0)::int as pending, count(*) filter (where pending = 0)::int as done from user_errors where user_id = $1`,
       [id],
     )
   )[0];
@@ -195,6 +198,7 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
       accuracy: s.answers ? Math.round((s.correct / s.answers) * 100) : 0,
       tests_passed: passed,
       errors_open: errs.open,
+      errors_pending: errs.pending,
       errors_resolved: errs.done,
       first_answer_at: iso(s.first_at),
       last_answer_at: iso(s.last_at),
@@ -206,6 +210,13 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
     claims: claims.map((r: any) => ({ ...r, created_at: iso(r.created_at) as string })),
     notes: notes.map((r: any) => ({ ...r, created_at: iso(r.created_at) as string })),
     audit: await listAudit({ user: id, perPage: 50 }).then((a) => a.rows),
+    checkpoints: (await getCourse(id)).checkpoints,
+    check_runs: (
+      await db.query(
+        `select id, milestone, kind, status, by_admin, started_at, finished_at, results from checkpoint_runs where user_id = $1 order by started_at desc limit 30`,
+        [id],
+      )
+    ).map((r: any) => ({ ...r, started_at: iso(r.started_at) as string, finished_at: iso(r.finished_at), results: typeof r.results === 'string' ? JSON.parse(r.results) : r.results })),
     recent: recent.map((r: any) => ({ ...r, created_at: iso(r.created_at) as string })),
   };
 }
@@ -233,12 +244,16 @@ export const AUDIT_ACTIONS: Record<string, string> = {
   set_tags: 'Теги',
   note_add: 'Заметка добавлена',
   note_delete: 'Заметка удалена',
+  checkpoint_clear: 'Проверка засчитана вручную',
+  useful_save: '«Полезно»: материал сохранён',
+  useful_delete: '«Полезно»: материал удалён',
+  useful_section: '«Полезно»: разделы',
 };
 
 const nameOf = (p: { display_name: string | null; telegram_username: string | null; telegram_id: number }) =>
   p.display_name || (p.telegram_username ? `@${p.telegram_username}` : `id${p.telegram_id}`);
 
-async function audit(q: Queryable, admin: Profile, action: string, target: { id: string; name: string } | null, details: Record<string, unknown> = {}) {
+export async function writeAudit(q: Queryable, admin: Profile, action: string, target: { id: string; name: string } | null, details: Record<string, unknown> = {}) {
   await q.query(
     `insert into admin_audit_log (admin_id, admin_name, action, target_user_id, target_name, details) values ($1, $2, $3, $4, $5, $6::jsonb)`,
     [admin.id, nameOf(admin), action, target?.id ?? null, target?.name ?? null, JSON.stringify(details)],
@@ -296,7 +311,7 @@ export async function adminGrantDays(admin: Profile, userId: string, days: numbe
     )[0];
     // отрицательное число не должно уводить дату раньше «сейчас», если доступа и так не было — оставляем как есть
     const until = iso(upd.access_until) as string;
-    await audit(q, admin, 'grant_days', { id: userId, name: nameOf(u) }, { days, before: iso(u.access_until), after: until, reason: cleanReason(reason) });
+    await writeAudit(q, admin, 'grant_days', { id: userId, name: nameOf(u) }, { days, before: iso(u.access_until), after: until, reason: cleanReason(reason) });
     return { until, telegramId: Number(u.telegram_id) };
   });
 }
@@ -313,7 +328,7 @@ export async function adminSetAccessUntil(admin: Profile, userId: string, date: 
       await q.query(`update profiles set access_until = (($2::date + time '23:59:59')::timestamp at time zone 'UTC') where id = $1 returning access_until`, [userId, date])
     )[0];
     const until = iso(upd.access_until) as string;
-    await audit(q, admin, 'set_access_until', { id: userId, name: nameOf(u) }, { before: iso(u.access_until), after: until, reason: cleanReason(reason) });
+    await writeAudit(q, admin, 'set_access_until', { id: userId, name: nameOf(u) }, { before: iso(u.access_until), after: until, reason: cleanReason(reason) });
     return { until, telegramId: Number(u.telegram_id) };
   });
 }
@@ -324,7 +339,7 @@ export async function adminEndAccess(admin: Profile, userId: string, reason?: st
   await db.tx(async (q) => {
     const u = await lockUser(q, userId);
     await q.query(`update profiles set access_until = now() where id = $1 and access_until > now()`, [userId]);
-    await audit(q, admin, 'end_access', { id: userId, name: nameOf(u) }, { before: iso(u.access_until), reason: cleanReason(reason) });
+    await writeAudit(q, admin, 'end_access', { id: userId, name: nameOf(u) }, { before: iso(u.access_until), reason: cleanReason(reason) });
   });
 }
 
@@ -338,7 +353,7 @@ export async function adminSetAdmin(admin: Profile, userId: string, on: boolean)
       if (left === 0) throw new ValidationError('Должен остаться хотя бы один администратор');
     }
     await q.query('update profiles set is_admin = $2 where id = $1', [userId, on]);
-    await audit(q, admin, 'set_admin', { id: userId, name: nameOf(u) }, { on });
+    await writeAudit(q, admin, 'set_admin', { id: userId, name: nameOf(u) }, { on });
   });
 }
 
@@ -352,7 +367,7 @@ export async function adminBlock(admin: Profile, userId: string, on: boolean, re
       `update profiles set blocked_at = case when $2::boolean then now() else null end, blocked_reason = case when $2::boolean then $3 else null end where id = $1`,
       [userId, on, on ? cleanReason(reason) || null : null],
     );
-    await audit(q, admin, on ? 'block' : 'unblock', { id: userId, name: nameOf(u) }, { reason: cleanReason(reason) });
+    await writeAudit(q, admin, on ? 'block' : 'unblock', { id: userId, name: nameOf(u) }, { reason: cleanReason(reason) });
   });
 }
 
@@ -373,7 +388,7 @@ export async function adminSetTags(admin: Profile, userId: string, tags: unknown
   await db.tx(async (q) => {
     const u = await lockUser(q, userId);
     await q.query('update profiles set tags = $2::text[] where id = $1', [userId, clean]);
-    await audit(q, admin, 'set_tags', { id: userId, name: nameOf(u) }, { tags: clean });
+    await writeAudit(q, admin, 'set_tags', { id: userId, name: nameOf(u) }, { tags: clean });
   });
   return clean;
 }
@@ -386,7 +401,7 @@ export async function adminAddNote(admin: Profile, userId: string, body: unknown
   await db.tx(async (q) => {
     const u = await lockUser(q, userId);
     await q.query('insert into user_notes (user_id, author_id, author_name, body) values ($1, $2, $3, $4)', [userId, admin.id, nameOf(admin), text]);
-    await audit(q, admin, 'note_add', { id: userId, name: nameOf(u) }, { preview: text.slice(0, 80) });
+    await writeAudit(q, admin, 'note_add', { id: userId, name: nameOf(u) }, { preview: text.slice(0, 80) });
   });
 }
 
@@ -396,6 +411,24 @@ export async function adminDeleteNote(admin: Profile, userId: string, noteId: nu
   await db.tx(async (q) => {
     const u = await lockUser(q, userId);
     const r = await q.query('delete from user_notes where id = $1 and user_id = $2 returning id', [noteId, userId]);
-    if (r.length) await audit(q, admin, 'note_delete', { id: userId, name: nameOf(u) }, { noteId });
+    if (r.length) await writeAudit(q, admin, 'note_delete', { id: userId, name: nameOf(u) }, { noteId });
+  });
+}
+
+/** Засчитывает проверку (закрепление) вручную — например, если пользователь застрял. Следующий тест откроется. */
+export async function adminClearCheckpoint(admin: Profile, userId: string, milestone: number) {
+  if (!UUID.test(userId)) throw new ValidationError('Пользователь не найден');
+  const db = await getDb();
+  return db.tx(async (q) => {
+    const u = (await q.query(`select ${PROFILE_COLS} from profiles where id = $1`, [userId]))[0];
+    if (!u) throw new ValidationError('Пользователь не найден');
+    const cp = (await getCourse(userId, q)).checkpoints.find((c) => c.milestone === milestone);
+    if (!cp) throw new ValidationError('Такой проверки нет в курсе');
+    if (cp.status === 'passed') throw new ValidationError('Проверка уже сдана');
+    await q.query(
+      `insert into checkpoint_runs (user_id, kind, milestone, tests, status, by_admin, finished_at) values ($1, $2, $3, '[]'::jsonb, 'passed', true, now())`,
+      [userId, cp.kind, milestone],
+    );
+    await writeAudit(q, admin, 'checkpoint_clear', { id: userId, name: nameOf(u) }, { milestone, kind: cp.kind });
   });
 }

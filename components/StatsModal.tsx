@@ -56,7 +56,7 @@ export default function StatsModal({ stats, readiness, passedTests, totalTests }
 
               <div className="grid grid-cols-2 gap-3">
                 <StatCard value={`${stats.accuracy_last30}%`} label="ТОЧНОСТЬ" sub="за последние 30 ответов" />
-                <StatCard value={stats.errors_resolved} label="ВЫУЧЕНО" sub={`${stats.errors_open} ${plural(stats.errors_open, 'ошибка', 'ошибки', 'ошибок')} ждут закрепления`} />
+                <StatCard value={stats.errors_resolved} label="ВЫУЧЕНО" sub={`осталось ${stats.errors_pending} ${plural(stats.errors_pending, 'повторение', 'повторения', 'повторений')}`} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">

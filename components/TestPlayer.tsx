@@ -16,8 +16,14 @@ interface Props {
   settings: { study: StudyLang; trans: TransLang; auto: boolean };
   /** Номер, который видит пользователь (сквозной в общем списке); по умолчанию — testNumber */
   displayNumber?: number;
-  nextTest?: { category: TestCategory; number: number; display: number } | null;
+  /** Что предложить после сданного теста: следующий тест, проверка (закрепление) или ничего */
+  after?: AfterTest;
 }
+
+export type AfterTest =
+  | { kind: 'test'; category: TestCategory; number: number; display: number }
+  | { kind: 'check'; milestone: number; final: boolean }
+  | null;
 
 type Phase = 'play' | 'submitting' | 'result' | 'review' | 'reviewSaving' | 'reviewDone' | 'errorsResult';
 
@@ -28,12 +34,12 @@ async function post(url: string, body: unknown) {
   return data;
 }
 
-export default function TestPlayer({ mode, category, testNumber, questions, settings, displayNumber, nextTest }: Props) {
+export default function TestPlayer({ mode, category, testNumber, questions, settings, displayNumber, after = null }: Props) {
   const router = useRouter();
   const [lang, setLang] = useState<LangState>({ study: settings.study, trans: settings.trans, showTrans: settings.auto });
   const [phase, setPhase] = useState<Phase>('play');
   const [result, setResult] = useState<SubmitResult | null>(null);
-  const [errorsSummary, setErrorsSummary] = useState<{ correct: number; wrong: number; remaining: number } | null>(null);
+  const [errorsSummary, setErrorsSummary] = useState<{ correct: number; wrong: number; remaining: number; questions: number } | null>(null);
   const [run, setRun] = useState(0); // меняется при «Пройти заново», чтобы сбросить Runner
   const [err, setErr] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -130,7 +136,10 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
     setPhase('play');
   };
 
-  const goNext = () => router.push(nextTest ? `/test/${nextTest.category}/${nextTest.number}` : '/test');
+  const goNext = () =>
+    router.push(after?.kind === 'test' ? `/test/${after.category}/${after.number}` : after?.kind === 'check' ? `/test/check/${after.milestone}` : '/test');
+  const nextLabel =
+    after?.kind === 'test' ? `Тест ${after.display}` : after?.kind === 'check' ? (after.final ? 'Финальная проверка' : 'Пройти проверку') : 'К списку тестов';
 
   if (phase === 'play' || phase === 'submitting') {
     return (
@@ -193,12 +202,14 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
         <h1 className="mt-4 text-2xl font-bold">{s.wrong === 0 ? 'Все верно!' : 'Продолжаем разбор'}</h1>
         <p className="mt-2 text-slate-400" data-testid="errors-summary">
           Верно {s.correct} из {s.correct + s.wrong}.{' '}
-          {s.remaining > 0 ? `В разделе осталось ${s.remaining} ${plural(s.remaining, 'вопрос', 'вопроса', 'вопросов')}.` : 'Раздел ошибок пуст — так держать!'}
+          {s.remaining > 0
+            ? `Осталось ${s.remaining} ${plural(s.remaining, 'повторение', 'повторения', 'повторений')} по ${s.questions} ${plural(s.questions, 'вопросу', 'вопросам', 'вопросам')}.`
+            : 'Раздел ошибок пуст — так держать!'}
         </p>
         <div className="mt-8 w-full max-w-xs space-y-3">
           {s.remaining > 0 && (
             <button className="btn btn-primary w-full" data-testid="more-errors" onClick={() => { setLoadingMore(true); router.refresh(); }}>
-              Ещё {Math.min(5, s.remaining)}
+              Ещё {Math.min(5, s.questions)}
             </button>
           )}
           <button className="btn btn-ghost w-full" onClick={() => router.push('/dashboard')}>На главную</button>
@@ -215,7 +226,7 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
         <h1 className="mt-4 text-2xl font-bold">Тест {shownNumber} сдан</h1>
         <p className="mt-2 max-w-xs text-slate-400">Ошибки сохранены в раздел «Ошибки» — вы вернётесь к ним позже.</p>
         <Actions>
-          <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest.display}` : 'К списку тестов'}</button>
+          <button className="btn btn-primary w-full" onClick={goNext}>{nextLabel}</button>
           <button className="btn btn-ghost w-full" onClick={() => router.push('/test')}>К списку тестов</button>
         </Actions>
       </Screen>
@@ -235,12 +246,12 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
           {r.outcome === 'fail' && 'Слишком много ошибок'}
         </h1>
         <p className="mt-2 max-w-xs text-slate-400" data-testid="result-text">
-          {r.outcome === 'perfect' && `Все ${r.total} ответов верны. Следующий тест открыт.`}
+          {r.outcome === 'perfect' && `Все ${r.total} ответов верны. ${after?.kind === 'check' ? (after.final ? 'Дальше — финальная проверка.' : 'Дальше — проверка: закрепим пройденное.') : 'Следующий тест открыт.'}`}
           {r.outcome === 'pass_review' && `Ошибок: ${r.errors}. Они уже в разделе «Ошибки» — давайте разберём их прямо сейчас.`}
           {r.outcome === 'fail' && `Ошибок: ${r.errors} из ${r.total}. Чтобы открыть следующий тест, нужно не больше ${MAX_ERRORS}.`}
         </p>
         <Actions>
-          {r.outcome === 'perfect' && <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest.display}` : 'К списку тестов'}</button>}
+          {r.outcome === 'perfect' && <button className="btn btn-primary w-full" onClick={goNext}>{nextLabel}</button>}
           {r.outcome === 'pass_review' && <button className="btn btn-primary w-full" onClick={startReview}>Решить ошибки ({r.errors})</button>}
           {r.outcome === 'fail' && (
             <>

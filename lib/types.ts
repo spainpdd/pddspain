@@ -63,6 +63,8 @@ export type TestStatus = 'locked' | 'available' | 'passed';
 export interface TestListItem {
   category: TestCategory;
   number: number;
+  /** сквозной номер в курсе (1…N): официальные, затем дополнительные */
+  display: number;
   playable: number;
   status: TestStatus;
   attempts: number;
@@ -77,7 +79,6 @@ export interface SubmitResult {
   outcome: 'perfect' | 'pass_review' | 'fail';
   wrongIds: string[];
   passed: boolean;
-  nextTest: number | null;
 }
 
 /** Входной ответ пользователя: id вопроса → выбранный вариант */

@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Lock, Check } from 'lucide-react';
+import { Lock, Check, Target, Trophy, ChevronRight } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
-import { listTests } from '@/lib/repo/content';
-import { canOpenTest, errorTone, orderTests, type ErrorTone } from '@/lib/engine';
+import { getCourse } from '@/lib/repo/content';
+import { canOpenCheckpoint, canOpenTest, CHECK_MINUTES, errorTone, MAX_ERRORS, type CheckpointInfo, type ErrorTone } from '@/lib/engine';
+import { plural } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 export const metadata = { title: 'Тесты' };
@@ -25,9 +26,10 @@ function Legend({ cls, text }: { cls: string; text: string }) {
 
 export default async function TestsListPage() {
   const user = await requireUser();
-  const [tests, acc] = await Promise.all([listTests(user.id), accessInfo(user)]);
-  // один общий список: сначала тесты официального набора, затем остальные; нумерация сквозная
-  const list = orderTests(tests);
+  const [{ tests: list, checkpoints }, acc] = await Promise.all([getCourse(user.id), accessInfo(user)]);
+  // один курс: сначала тесты официального набора, затем остальные; нумерация сквозная.
+  // После каждых 10 тестов (и в конце) — широкая плитка проверки.
+  const checkAfter = new Map(checkpoints.map((c) => [c.milestone, c]));
 
   return (
     <div>
@@ -47,7 +49,7 @@ export default async function TestsListPage() {
 
         <div className="grid grid-cols-5 gap-2.5" data-testid="test-grid">
           {list.map((t) => {
-            const allowed = canOpenTest(t.category, t.number, acc);
+            const allowed = canOpenTest(t, acc);
             const locked = t.status === 'locked';
             const tone: ErrorTone = !locked && allowed ? errorTone(t.best_errors) : 'none';
             const href = locked ? null : allowed ? `/test/${t.category}/${t.number}` : '/pay';
@@ -74,7 +76,7 @@ export default async function TestsListPage() {
               </>
             );
             const testid = `test-${t.category}-${t.number}`;
-            return href ? (
+            const tile = href ? (
               <Link key={testid} href={href} className={cls} data-testid={testid} data-status={t.status}>
                 {inner}
               </Link>
@@ -83,6 +85,8 @@ export default async function TestsListPage() {
                 {inner}
               </div>
             );
+            const cp = checkAfter.get(t.display);
+            return cp ? [tile, <CheckTile key={`check-${cp.milestone}`} cp={cp} open={canOpenCheckpoint(cp.milestone, acc.paid)} />] : tile;
           })}
         </div>
 
@@ -94,10 +98,50 @@ export default async function TestsListPage() {
               <Legend cls="bg-orange-500" text="2" />
               <Legend cls="bg-red-500" text="3+ (не сдан)" />
             </div>
+            <p className="mt-2 text-center text-xs text-slate-500">
+              После каждых 10 тестов — проверка из случайных пройденных тестов: следующий тест откроется после неё.
+            </p>
             <p className="mt-2 text-center text-xs text-slate-500">Цифра в плитке — лучший результат (ошибок).</p>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Широкая плитка проверки («закрепление» после каждых 10 тестов, «финал» в конце курса) */
+function CheckTile({ cp, open }: { cp: CheckpointInfo; open: boolean }) {
+  const final = cp.kind === 'final';
+  const passed = cp.status === 'passed';
+  const locked = cp.status === 'locked';
+  const Icon = final ? Trophy : Target;
+  const href = locked ? null : open ? `/test/check/${cp.milestone}` : '/pay';
+  const cls = cn(
+    'col-span-5 flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition',
+    passed && 'border-green-600/50 bg-green-500/15 text-green-800',
+    cp.status === 'available' && open && 'border-amber-500/70 bg-amber-400/20 text-amber-900',
+    ((cp.status === 'available' && !open) || locked) && 'border-slate-200 bg-ink-900/50 text-slate-400',
+  );
+  const inner = (
+    <>
+      <Icon size={22} className="shrink-0" />
+      <div className="min-w-0 flex-1">
+        <div className="font-semibold leading-tight">{final ? 'Финальная проверка' : 'Закрепление'}</div>
+        <div className="mt-0.5 text-xs opacity-80">
+          {cp.tests} {plural(cp.tests, 'тест', 'теста', 'тестов')} подряд · по {CHECK_MINUTES} мин · до {MAX_ERRORS} ошибок
+        </div>
+      </div>
+      {passed ? <Check size={20} strokeWidth={3} /> : locked || !open ? <Lock size={16} /> : <ChevronRight size={20} />}
+    </>
+  );
+  const testid = `check-${cp.milestone}`;
+  return href ? (
+    <Link href={href} className={cls} data-testid={testid} data-status={cp.status}>
+      {inner}
+    </Link>
+  ) : (
+    <div className={cls} data-testid={testid} data-status="locked">
+      {inner}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
-  evaluateTest, computeStatuses, pickErrorBatch, extendAccess, decideClaim, dailyIndex,
-  madridDateKey, hasPaidAccess, canOpenTest, nextAfter, currentTest, readinessPercent, errorTone, orderTests,
+  evaluateTest, computeCourseStatuses, pickErrorBatch, extendAccess, decideClaim, dailyIndex,
+  madridDateKey, hasPaidAccess, canOpenTest, currentTest, readinessPercent, errorTone, orderTests,
+  checkpointMilestones, computeCheckpoints, canOpenCheckpoint, pickRandom, checkpointPassed, isMidMilestone,
 } from '../lib/engine';
 
 describe('evaluateTest', () => {
@@ -14,30 +15,86 @@ describe('evaluateTest', () => {
   });
 });
 
-describe('computeStatuses', () => {
+describe('computeCourseStatuses', () => {
+  const set = (...n: number[]) => new Set(n);
   it('первый доступен, следующий открывается только после сдачи предыдущего', () => {
-    const st = computeStatuses([1, 2, 3, 4], new Set([1, 2]));
-    expect([...st.values()]).toEqual(['passed', 'passed', 'available', 'locked']);
+    expect([...computeCourseStatuses(4, set(1, 2), set()).values()]).toEqual(['passed', 'passed', 'available', 'locked']);
   });
   it('ничего не сдано — доступен только первый', () => {
-    const st = computeStatuses([1, 2, 3], new Set());
-    expect([...st.values()]).toEqual(['available', 'locked', 'locked']);
+    expect([...computeCourseStatuses(3, set(), set()).values()]).toEqual(['available', 'locked', 'locked']);
   });
-  it('пропуски в нумерации не ломают цепочку', () => {
-    const st = computeStatuses([1, 5, 9], new Set([1]));
-    expect(st.get(5)).toBe('available');
-    expect(st.get(9)).toBe('locked');
+  it('после 10-го теста следующий закрыт, пока не сдана проверка', () => {
+    const all10 = set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    expect(computeCourseStatuses(25, all10, set()).get(11)).toBe('locked');
+    expect(computeCourseStatuses(25, all10, set(10)).get(11)).toBe('available');
+    expect(computeCourseStatuses(25, all10, set(10)).get(12)).toBe('locked');
   });
-  it('currentTest / nextAfter', () => {
-    expect(currentTest([{ category: 'official', number: 1, status: 'passed' }, { category: 'official', number: 2, status: 'available' }])).toBe(2);
-    expect(currentTest([{ category: 'official', number: 1, status: 'passed' }])).toBeNull();
-    expect(nextAfter([1, 2, 3], 3)).toBeNull();
-    expect(nextAfter([1, 2, 3], 1)).toBe(2);
+  it('на последнем тесте проверка ничего не блокирует (финальная — после курса)', () => {
+    const st = computeCourseStatuses(10, set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), set());
+    expect(st.get(10)).toBe('passed');
+    expect(isMidMilestone(10, 10)).toBe(false);
+    expect(isMidMilestone(10, 11)).toBe(true);
+  });
+  it('currentTest — первый открытый несданный', () => {
+    expect(currentTest([{ status: 'passed' as const }, { status: 'available' as const }, { status: 'locked' as const }])).toEqual({ status: 'available' });
+    expect(currentTest([{ status: 'passed' as const }])).toBeNull();
+  });
+});
+
+describe('проверки (закрепление)', () => {
+  it('рубежи: после 10, 20, … по k+2 теста, финальная — 15 тестов в конце', () => {
+    const m = checkpointMilestones(93);
+    expect(m.slice(0, 3)).toEqual([
+      { milestone: 10, kind: 'mid', tests: 3 },
+      { milestone: 20, kind: 'mid', tests: 4 },
+      { milestone: 30, kind: 'mid', tests: 5 },
+    ]);
+    expect(m.filter((x) => x.kind === 'mid')).toHaveLength(9);
+    expect(m[m.length - 1]).toEqual({ milestone: 93, kind: 'final', tests: 15 });
+  });
+  it('если курс кратен 10, на последнем рубеже стоит только финальная проверка', () => {
+    const m = checkpointMilestones(90);
+    expect(m.filter((x) => x.milestone === 90)).toEqual([{ milestone: 90, kind: 'final', tests: 15 }]);
+    expect(checkpointMilestones(0)).toEqual([]);
+    expect(checkpointMilestones(3)).toEqual([{ milestone: 3, kind: 'final', tests: 15 }]);
+  });
+  it('доступна, когда сданы все тесты до рубежа; сданной остаётся навсегда', () => {
+    const p = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(computeCheckpoints(25, p, new Set())[0].status).toBe('locked');
+    p.add(10);
+    expect(computeCheckpoints(25, p, new Set())[0].status).toBe('available');
+    expect(computeCheckpoints(25, p, new Set([10]))[0].status).toBe('passed');
+    expect(computeCheckpoints(25, p, new Set())[1].status).toBe('locked');
+  });
+  it('без подписки — только проверки в бесплатном пуле (до 20)', () => {
+    expect(canOpenCheckpoint(10, false)).toBe(true);
+    expect(canOpenCheckpoint(20, false)).toBe(true);
+    expect(canOpenCheckpoint(30, false)).toBe(false);
+    expect(canOpenCheckpoint(30, true)).toBe(true);
+  });
+  it('pickRandom: разные элементы, нужное число, не больше доступного', () => {
+    const pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const r = pickRandom(pool, 3);
+    expect(r).toHaveLength(3);
+    expect(new Set(r).size).toBe(3);
+    expect(r.every((x) => pool.includes(x))).toBe(true);
+    expect(pickRandom([1, 2], 15)).toHaveLength(2);
+    expect(pickRandom([], 3)).toEqual([]);
+    expect(pool).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // исходный массив не меняется
+    expect(pickRandom(pool, 3, () => 0)).toEqual([1, 2, 3]);
+  });
+  it('сдана, только если в КАЖДОМ тесте не больше 2 ошибок', () => {
+    expect(checkpointPassed([{ errors: 0 }, { errors: 2 }, { errors: 1 }])).toBe(true);
+    expect(checkpointPassed([{ errors: 0 }, { errors: 3 }, { errors: 0 }])).toBe(false);
+    expect(checkpointPassed([])).toBe(false);
   });
 });
 
 describe('pickErrorBatch', () => {
-  const mk = (id: string, t: number, w: number) => ({ question_id: id, times_wrong: w, last_seen_at: new Date(t) });
+  const mk = (id: string, t: number, w: number, pending?: number) => ({ question_id: id, times_wrong: w, pending, last_seen_at: new Date(t) });
+  it('при равенстве времени больше повторений — раньше', () => {
+    expect(pickErrorBatch([mk('a', 1, 9, 1), mk('b', 1, 1, 5)]).map((r) => r.question_id)).toEqual(['b', 'a']);
+  });
   it('не больше 5; давно не показанные — первыми', () => {
     const rows = [mk('a', 6, 1), mk('b', 1, 1), mk('c', 2, 1), mk('d', 3, 1), mk('e', 4, 1), mk('f', 5, 1), mk('g', 0, 1)];
     expect(pickErrorBatch(rows).map((r) => r.question_id)).toEqual(['g', 'b', 'c', 'd', 'e']);
@@ -59,25 +116,25 @@ describe('доступ', () => {
     expect(hasPaidAccess('2026-09-20T00:00:00Z', now)).toBe(false);
     expect(hasPaidAccess('2026-09-22T00:00:00Z', now)).toBe(true);
   });
-  it('canOpenTest: mixed всегда открыт, paid — всё открыто', () => {
-    expect(canOpenTest('mixed', 50, { paid: false, todayFreeTest: null })).toBe(true);
-    expect(canOpenTest('official', 2, { paid: true, todayFreeTest: null })).toBe(true);
+  it('canOpenTest: платный доступ открывает всё, что открыто по очереди', () => {
+    expect(canOpenTest({ display: 50, status: 'available' }, { paid: true, todayFreeTest: null })).toBe(true);
   });
-  it('canOpenTest: без оплаты — один бесплатный тест в день из первых 20', () => {
+  it('canOpenTest: без оплаты — один бесплатный тест в день из первых 20 (сквозной номер курса)', () => {
     const noFree = { paid: false, todayFreeTest: null };
-    expect(canOpenTest('official', 1, noFree)).toBe(true);
-    expect(canOpenTest('official', 20, noFree)).toBe(true);
-    expect(canOpenTest('official', 21, noFree)).toBe(false);
-    // уже выбран тест 5 сегодня — он и только он доступен
+    expect(canOpenTest({ display: 1, status: 'available' }, noFree)).toBe(true);
+    expect(canOpenTest({ display: 20, status: 'available' }, noFree)).toBe(true);
+    expect(canOpenTest({ display: 21, status: 'available' }, noFree)).toBe(false);
+    expect(canOpenTest({ display: 50, status: 'available' }, noFree)).toBe(false); // дополнительные тесты больше не бесплатны для всех
+    // уже выбран тест 5 сегодня — он и только он новый доступен
     const picked5 = { paid: false, todayFreeTest: 5 };
-    expect(canOpenTest('official', 5, picked5)).toBe(true);
-    expect(canOpenTest('official', 7, picked5)).toBe(false);
+    expect(canOpenTest({ display: 5, status: 'available' }, picked5)).toBe(true);
+    expect(canOpenTest({ display: 7, status: 'available' }, picked5)).toBe(false);
   });
   it('canOpenTest: уже сданный тест free-пользователь открывает повторно, даже если сегодня начат другой', () => {
-    const acc = { paid: false, todayFreeTest: 3, passedTests: [1, 2] };
-    expect(canOpenTest('official', 1, acc)).toBe(true);
-    expect(canOpenTest('official', 3, acc)).toBe(true);
-    expect(canOpenTest('official', 4, acc)).toBe(false);
+    const acc = { paid: false, todayFreeTest: 3 };
+    expect(canOpenTest({ display: 1, status: 'passed' }, acc)).toBe(true);
+    expect(canOpenTest({ display: 3, status: 'available' }, acc)).toBe(true);
+    expect(canOpenTest({ display: 4, status: 'available' }, acc)).toBe(false);
   });
   it('readinessPercent: сданные тесты к общему числу', () => {
     expect(readinessPercent(1, 90)).toBe(1);
