@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
 import { getPricing } from '@/lib/repo/config';
+import { getDisplayCurrency } from '@/lib/site-currency';
 import { getDb } from '@/lib/db';
 import { ClaimForm, SettingsForm } from '@/components/ProfileForms';
 import { formatDate, formatPrice, plural } from '@/lib/utils';
@@ -50,7 +51,7 @@ export default async function ProfilePage() {
               {user.access_until ? `Доступ закончился ${formatDate(user.access_until)}.` : 'Подписки нет.'}
             </p>
           )}
-          <Link href="/pay" className="btn btn-primary btn-sm">{acc.paid ? 'Продлить на 100 дней' : `Открыть доступ — ${formatPrice(pricing, user.trans_lang)}`}</Link>
+          <Link href="/pay" className="btn btn-primary btn-sm">{acc.paid ? 'Продлить на 100 дней' : `Открыть доступ — ${formatPrice(pricing, getDisplayCurrency(user.trans_lang))}`}</Link>
         </div>
       </section>
 

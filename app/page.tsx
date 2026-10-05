@@ -8,6 +8,7 @@ import { getSiteLang } from '@/lib/site-lang';
 import { LANDING } from '@/lib/site-i18n';
 import LangSwitcher from '@/components/LangSwitcher';
 import { sellerLine } from '@/lib/seller';
+import { getDisplayCurrency } from '@/lib/site-currency';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,7 @@ export default async function Landing() {
 
         <section id="pricing" className="card mx-auto mt-14 max-w-sm p-8 text-center">
           <div className="text-sm font-medium text-brand-600">{t.priceBadge}</div>
-          <div className="mt-2 text-5xl font-bold" data-testid="landing-price">{formatPrice(pricing, lang)}</div>
+          <div className="mt-2 text-5xl font-bold" data-testid="landing-price">{formatPrice(pricing, getDisplayCurrency(lang))}</div>
           <div className="mt-1 text-slate-500">{t.priceDays}</div>
           <ul className="mt-6 space-y-2 text-left text-sm text-slate-600">
             {t.priceList.map((x) => (
