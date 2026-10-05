@@ -104,8 +104,14 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
       } catch {
         /* журнал повторного решения не критичен */
       }
-      setPhase(result?.passed ? 'reviewDone' : 'result');
-      router.refresh();
+      if (result?.passed) {
+        setPhase('reviewDone');
+        router.refresh();
+      } else {
+        // тест не сдан: после разбора ошибок сразу к плиткам тестов (а не обратно на «слишком много ошибок»)
+        router.push('/test');
+        router.refresh();
+      }
     },
     [category, testNumber, result, router],
   );
