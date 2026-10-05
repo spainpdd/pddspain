@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, BookOpen, AlertCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,15 @@ const items = [
 
 export default function BottomNav({ errorsOpen }: { errorsOpen: number }) {
   const pathname = usePathname() ?? '';
+  const router = useRouter();
+  // Layout не перерисовывается при переходах внутри приложения, поэтому счётчик ошибок
+  // обновляем вручную, когда пользователь уходит с экранов, где он мог измениться.
+  const prev = useRef(pathname);
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = pathname;
+    if (was !== pathname && (was.startsWith('/errors') || was.startsWith('/test/'))) router.refresh();
+  }, [pathname, router]);
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-ink/95 backdrop-blur pb-safe">
       <div className="mx-auto flex h-14 max-w-lg items-center justify-around">
