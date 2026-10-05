@@ -4,8 +4,8 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { SESSION_COOKIE, verifySession } from './session';
 import { getProfile } from './repo/users';
+import { getTodayFreeTest } from './repo/progress';
 import { hasPaidAccess } from './engine';
-import { env } from './env';
 import type { Profile } from './types';
 
 /** Текущий пользователь (или null). Кэшируется в пределах одного запроса. */
@@ -26,10 +26,11 @@ export async function requireAdmin(): Promise<Profile> {
   return u;
 }
 
-export function accessInfo(p: Profile) {
+export async function accessInfo(p: Profile) {
   const paid = hasPaidAccess(p.access_until);
   const daysLeft = paid ? Math.ceil((new Date(p.access_until!).getTime() - Date.now()) / 86_400_000) : 0;
-  return { paid, daysLeft, freeTests: env.freeTests };
+  const todayFreeTest = paid ? null : await getTodayFreeTest(p.id);
+  return { paid, daysLeft, todayFreeTest };
 }
 
 /** Защита от CSRF для изменяющих запросов: Origin должен совпадать с Host */

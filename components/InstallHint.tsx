@@ -38,7 +38,7 @@ export default function InstallHint() {
   return (
     <div className="card mt-6 flex items-center gap-3 p-4 text-sm">
       {ios ? <Share size={20} className="shrink-0 text-brand-400" /> : <Download size={20} className="shrink-0 text-brand-400" />}
-      <div className="flex-1 text-slate-300">
+      <div className="flex-1 text-slate-700">
         {ios ? 'Установите как приложение: «Поделиться» → «На экран “Домой”».' : 'Установите на телефон — откроется как обычное приложение.'}
       </div>
       {evt && (

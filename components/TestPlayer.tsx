@@ -165,7 +165,7 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
   if (phase === 'reviewDone' && result) {
     return (
       <Screen>
-        <CheckCircle2 size={64} className="text-green-400" />
+        <CheckCircle2 size={64} className="text-green-500" />
         <h1 className="mt-4 text-2xl font-bold">Тест {testNumber} сдан</h1>
         <p className="mt-2 max-w-xs text-slate-400">Ошибки сохранены в раздел «Ошибки» — вы вернётесь к ним позже.</p>
         <Actions>
@@ -180,9 +180,9 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
     const r = result;
     return (
       <Screen>
-        {r.outcome === 'perfect' && <CheckCircle2 size={64} className="text-green-400" />}
-        {r.outcome === 'pass_review' && <AlertTriangle size={64} className="text-amber-400" />}
-        {r.outcome === 'fail' && <XCircle size={64} className="text-red-400" />}
+        {r.outcome === 'perfect' && <CheckCircle2 size={64} className="text-green-500" />}
+        {r.outcome === 'pass_review' && <AlertTriangle size={64} className="text-amber-500" />}
+        {r.outcome === 'fail' && <XCircle size={64} className="text-red-500" />}
         <h1 className="mt-4 text-2xl font-bold" data-testid="result-title">
           {r.outcome === 'perfect' && 'Без ошибок!'}
           {r.outcome === 'pass_review' && 'Тест сдан'}
@@ -217,5 +217,5 @@ function Actions({ children }: { children: React.ReactNode }) {
   return <div className="mt-8 w-full max-w-xs space-y-3">{children}</div>;
 }
 function Overlay({ children }: { children: React.ReactNode }) {
-  return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/80 text-slate-200 backdrop-blur-sm">{children}</div>;
+  return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/70 text-white backdrop-blur-sm">{children}</div>;
 }

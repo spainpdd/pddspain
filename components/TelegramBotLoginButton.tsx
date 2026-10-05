@@ -83,7 +83,7 @@ export default function TelegramBotLoginButton() {
   if (status === 'timeout' || status === 'error') {
     return (
       <div className="flex flex-col items-center gap-3">
-        <p className="text-sm text-amber-300">
+        <p className="text-sm text-amber-700">
           {status === 'timeout' ? 'Не дождались подтверждения. Попробуйте ещё раз.' : 'Не удалось начать вход. Попробуйте ещё раз.'}
         </p>
         <button className="btn btn-primary w-full" onClick={start} data-testid="tg-bot-login">

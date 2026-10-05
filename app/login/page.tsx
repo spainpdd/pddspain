@@ -39,17 +39,17 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
             </details>
           </>
         ) : (
-          <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
+          <p className="rounded-xl border border-amber-400/50 bg-amber-50 p-3 text-sm text-amber-700">
             Не задан NEXT_PUBLIC_TELEGRAM_BOT_USERNAME — кнопка Telegram недоступна.
           </p>
         )}
       </div>
 
-      {searchParams.error && <p className="mt-4 text-sm text-red-400" role="alert">{ERRORS[searchParams.error] ?? 'Ошибка входа.'}</p>}
+      {searchParams.error && <p className="mt-4 text-sm text-red-600" role="alert">{ERRORS[searchParams.error] ?? 'Ошибка входа.'}</p>}
 
       {env.devLogin && (
-        <form action="/api/auth/dev" method="post" className="mt-8 w-full space-y-2 rounded-2xl border border-dashed border-slate-700 p-4 text-left">
-          <p className="text-xs text-amber-400">Режим разработчика (ENABLE_DEV_LOGIN)</p>
+        <form action="/api/auth/dev" method="post" className="mt-8 w-full space-y-2 rounded-2xl border border-dashed border-slate-300 p-4 text-left">
+          <p className="text-xs text-amber-600">Режим разработчика (ENABLE_DEV_LOGIN)</p>
           <input name="name" defaultValue="Dev User" className="input" aria-label="Имя" />
           <input name="id" defaultValue="9001" className="input" aria-label="Telegram ID" inputMode="numeric" />
           <button className="btn btn-ghost btn-sm w-full" data-testid="dev-login">Войти как разработчик</button>

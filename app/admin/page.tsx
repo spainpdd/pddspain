@@ -9,7 +9,7 @@ export default async function AdminHome() {
     ['С активным доступом', o.paid_active],
     ['Оплат', o.payments],
     ['Вопросов', o.questions, '/admin/questions'],
-    ['Права не подтверждены', o.unverified, '/admin/questions?rights=unverified', o.unverified ? 'text-amber-300' : ''],
+    ['Права не подтверждены', o.unverified, '/admin/questions?rights=unverified', o.unverified ? 'text-amber-700' : ''],
     ['Нет перевода RU', o.no_ru, '/admin/questions?missing=ru'],
     ['Нет перевода HY', o.no_hy, '/admin/questions?missing=hy'],
     ['Тестов', o.tests, '/admin/tests'],
@@ -29,7 +29,7 @@ export default async function AdminHome() {
         })}
       </div>
       <div className="card mt-6 p-4 text-sm text-slate-400">
-        <p>Пользователям показываются вопросы: активные и со статусом прав <b>own / dgt_official / licensed</b>{env.serveUnverified ? <> и <b className="text-red-300">unverified</b> (включён переключатель)</> : ''}.</p>
+        <p>Пользователям показываются вопросы: активные и со статусом прав <b>own / dgt_official / licensed</b>{env.serveUnverified ? <> и <b className="text-red-700">unverified</b> (включён переключатель)</> : ''}.</p>
         <p className="mt-2">Как менять вопросы постепенно: <Link href="/admin/questions" className="text-brand-400 underline">Вопросы</Link> → откройте нужный → правьте формулировку, варианты, перевод, картинку. Изменения сразу видны в тестах.</p>
       </div>
     </div>

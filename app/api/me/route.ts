@@ -7,9 +7,12 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const a = await apiUser();
   if ('res' in a) return a.res;
-  const [stats] = await Promise.all([getStats(a.user.id)]);
-  const acc = accessInfo(a.user);
-  return json({ profile: a.user, stats, access: { paid: acc.paid, daysLeft: acc.daysLeft, until: a.user.access_until } });
+  const [stats, acc] = await Promise.all([getStats(a.user.id), accessInfo(a.user)]);
+  return json({
+    profile: a.user,
+    stats,
+    access: { paid: acc.paid, daysLeft: acc.daysLeft, until: a.user.access_until, todayFreeTest: acc.todayFreeTest },
+  });
 }
 
 export async function PATCH(req: Request) {

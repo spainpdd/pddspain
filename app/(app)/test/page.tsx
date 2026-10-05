@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Lock, Check } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { listTests } from '@/lib/repo/content';
-import { TEST_COUNT, MAX_ERRORS, canOpenTest } from '@/lib/engine';
+import { TEST_COUNT, MAX_ERRORS, canOpenTest, type FreeAccess } from '@/lib/engine';
 import type { TestCategory, TestListItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -10,8 +10,7 @@ export const metadata = { title: 'Тесты' };
 
 export default async function TestsListPage() {
   const user = await requireUser();
-  const tests = await listTests(user.id);
-  const acc = accessInfo(user);
+  const [tests, acc] = await Promise.all([listTests(user.id), accessInfo(user)]);
   const official = tests.filter((t) => t.category === 'official');
   const mixed = tests.filter((t) => t.category === 'mixed');
 
@@ -49,7 +48,7 @@ function Section({
   title: string;
   note: string;
   tests: TestListItem[];
-  acc: { paid: boolean; freeTests: number };
+  acc: FreeAccess;
   soon?: number;
 }) {
   const category: TestCategory | null = tests[0]?.category ?? null;
@@ -62,21 +61,21 @@ function Section({
 
       <div className="grid grid-cols-5 gap-2.5" data-testid={category ? `test-grid-${category}` : undefined}>
         {tests.map((t) => {
-          const allowed = canOpenTest(t.category, t.number, acc.paid, acc.freeTests);
+          const allowed = canOpenTest(t.category, t.number, acc);
           const locked = t.status === 'locked';
           const href = locked ? null : allowed ? `/test/${t.category}/${t.number}` : '/pay';
           const cls = cn(
             'relative flex aspect-square flex-col items-center justify-center rounded-2xl border text-lg font-semibold transition',
-            t.status === 'passed' && 'border-green-600/50 bg-green-500/10 text-green-300',
-            t.status === 'available' && 'border-brand-500 bg-brand-500/10 text-white',
-            locked && 'border-slate-800 bg-ink-900/50 text-slate-600',
-            !locked && !allowed && 'border-slate-700 bg-ink-900 text-slate-400',
+            t.status === 'passed' && 'border-green-600/50 bg-green-500/10 text-green-700',
+            t.status === 'available' && 'border-brand-500 bg-brand-500/10 text-brand-700',
+            locked && 'border-slate-200 bg-ink-900/50 text-slate-400',
+            !locked && !allowed && 'border-slate-200 bg-ink-900 text-slate-400',
           );
           const inner = (
             <>
               <span>{t.number}</span>
               {t.status === 'passed' && (
-                <span className="flex items-center gap-0.5 text-[10px] font-medium text-green-400/80">
+                <span className="flex items-center gap-0.5 text-[10px] font-medium text-green-600/80">
                   <Check size={10} strokeWidth={3} />
                   {t.best_errors}
                 </span>

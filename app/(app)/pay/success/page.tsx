@@ -20,9 +20,10 @@ export default async function PaySuccess({ searchParams }: { searchParams: { ses
       console.error('pay/success: не удалось проверить сессию', e);
     }
   }
+  const acc = await accessInfo(user);
   return (
     <div className="pt-16 text-center">
-      <PayStatus initiallyPaid={accessInfo(user).paid} />
+      <PayStatus initiallyPaid={acc.paid} />
     </div>
   );
 }

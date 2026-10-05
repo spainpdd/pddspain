@@ -73,34 +73,80 @@ export async function updateSettings(
   return rows[0] ? mapProfile(rows[0]) : null;
 }
 
+export interface DayActivity {
+  date: string; // YYYY-MM-DD (Europe/Madrid)
+  count: number;
+}
+
 export interface Stats {
   total_answers: number;
   total_correct: number;
   today_answers: number;
   today_correct: number;
   errors_open: number;
-  accuracy: number; // %
+  errors_resolved: number;
+  distinct_questions: number;
+  accuracy: number; // % за всё время
+  accuracy_last30: number; // % за последние 30 ответов
+  streak_days: number; // дней подряд с хотя бы одним ответом, включая сегодня
+  activity_14: DayActivity[]; // 14 дней, от старых к новым
 }
 
 const TODAY_START = `(date_trunc('day', now() at time zone 'Europe/Madrid') at time zone 'Europe/Madrid')`;
 
 export async function getStats(userId: string, q?: Queryable): Promise<Stats> {
   const db = q ?? (await getDb());
-  const r = (
-    await db.query(
+  const [base, last30rows, dayRows] = await Promise.all([
+    db.query(
       `select
          (select count(*)::int from answer_log where user_id = $1)                                  as total_answers,
          (select count(*)::int from answer_log where user_id = $1 and correct)                      as total_correct,
          (select count(*)::int from answer_log where user_id = $1 and created_at >= ${TODAY_START}) as today_answers,
          (select count(*)::int from answer_log where user_id = $1 and correct
                                                 and created_at >= ${TODAY_START})                   as today_correct,
-         (select count(*)::int from user_errors where user_id = $1 and not resolved)                as errors_open`,
+         (select count(distinct question_id)::int from answer_log where user_id = $1)                as distinct_questions,
+         (select count(*)::int from user_errors where user_id = $1 and not resolved)                as errors_open,
+         (select count(*)::int from user_errors where user_id = $1 and resolved)                    as errors_resolved`,
       [userId],
-    )
-  )[0];
+    ),
+    db.query<{ correct: boolean }>(
+      `select correct from answer_log where user_id = $1 order by created_at desc limit 30`,
+      [userId],
+    ),
+    db.query<{ day: string; n: number }>(
+      `select to_char(date_trunc('day', created_at at time zone 'Europe/Madrid'), 'YYYY-MM-DD') as day, count(*)::int as n
+         from answer_log
+        where user_id = $1 and created_at >= now() - interval '60 days'
+        group by 1`,
+      [userId],
+    ),
+  ]);
+  const r = base[0];
+
+  const accuracy_last30 = last30rows.length ? Math.round((last30rows.filter((x) => x.correct).length / last30rows.length) * 100) : 0;
+
+  const byDay = new Map(dayRows.map((d) => [d.day, d.n]));
+  const dayKey = (offset: number) => {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - offset);
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(d);
+  };
+  let streak_days = 0;
+  for (let i = 0; i < 60; i++) {
+    if ((byDay.get(dayKey(i)) ?? 0) > 0) streak_days++;
+    else break;
+  }
+  const activity_14: DayActivity[] = Array.from({ length: 14 }, (_, i) => {
+    const date = dayKey(13 - i);
+    return { date, count: byDay.get(date) ?? 0 };
+  });
+
   return {
     ...r,
     accuracy: r.total_answers ? Math.round((r.total_correct / r.total_answers) * 100) : 0,
+    accuracy_last30,
+    streak_days,
+    activity_14,
   };
 }
 

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   applicationName: 'DGT Права',
   icons: { icon: '/icons/favicon-32.png', apple: '/icons/apple-touch-icon.png' },
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'DGT Права' },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'DGT Права' },
   robots: { index: true, follow: true },
 };
 
@@ -16,7 +16,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#020617',
+  themeColor: '#eef2f9',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

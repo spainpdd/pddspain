@@ -17,9 +17,13 @@ export const MAX_ERRORS = 2;
 export const ERRORS_BATCH = 5;
 
 export const ACCESS_DAYS = 100;
-export const PRICE_CENTS = 5000;
+/** Цена по умолчанию (используется, пока в app_config нет своей записи) */
+export const PRICE_CENTS = 4900;
 /** На сколько дней продлевается доступ по гарантии после несданного экзамена */
 export const GUARANTEE_EXTENSION_DAYS = 30;
+
+/** Сколько первых тестов входят в пул «можно решить один бесплатно сегодня» */
+export const FREE_TEST_POOL = 20;
 
 export type TestOutcome = 'perfect' | 'pass_review' | 'fail';
 
@@ -88,10 +92,24 @@ export function hasPaidAccess(accessUntil: string | Date | null | undefined, now
   return new Date(accessUntil).getTime() > now.getTime();
 }
 
-/** Можно ли открыть тест n: платный доступ либо тест входит в бесплатные */
-/** «mixed» — без платного доступа, всегда открыт */
-export function canOpenTest(category: TestCategory, n: number, paid: boolean, freeTests: number): boolean {
-  return category === 'mixed' || paid || n <= freeTests;
+export interface FreeAccess {
+  paid: boolean;
+  /** Номер теста, уже выбранного сегодня как бесплатный (null — выбор ещё не сделан) */
+  todayFreeTest: number | null;
+}
+
+/**
+ * Можно ли открыть тест n.
+ *  • «mixed»        — без платного доступа, всегда открыт.
+ *  • платный доступ — открыто всё.
+ *  • иначе          — бесплатно только из первых FREE_TEST_POOL тестов, и только один
+ *                      в день (тот, что уже выбран сегодня, либо ещё не выбранный).
+ */
+export function canOpenTest(category: TestCategory, n: number, acc: FreeAccess): boolean {
+  if (category === 'mixed') return true;
+  if (acc.paid) return true;
+  if (n > FREE_TEST_POOL) return false;
+  return acc.todayFreeTest === null || acc.todayFreeTest === n;
 }
 
 export function addDays(base: Date, days: number): Date {

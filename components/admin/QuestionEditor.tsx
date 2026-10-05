@@ -59,6 +59,24 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
     if (r.ok) set({ image_url: d.url }); else setMsg({ ok: false, text: d.error ?? 'Не удалось загрузить' });
   };
 
+  const download = async () => {
+    if (!f.image_url) return;
+    try {
+      const r = await fetch(f.image_url);
+      if (!r.ok) throw new Error(String(r.status));
+      const blob = await r.blob();
+      const ext = (f.image_url.split('?')[0].split('.').pop() || 'jpg').slice(0, 5);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${f.id ?? 'question'}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {
+      setMsg({ ok: false, text: 'Не удалось скачать картинку' });
+    }
+  };
+
   const cur = tr(tab);
   const es = tr('es');
   const filled = (l: L) => !!(f.i18n[l]?.text?.trim());
@@ -66,10 +84,10 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
   return (
     <div className="space-y-5" data-testid="editor">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Link href="/admin/questions" className="text-sm text-slate-500 hover:text-slate-300">← К списку</Link>
+        <Link href="/admin/questions" className="text-sm text-slate-500 hover:text-slate-700">← К списку</Link>
         <div className="flex items-center gap-3">
-          {msg && <span className={cn('text-sm', msg.ok ? 'text-green-400' : 'text-red-400')} role="status" data-testid="save-msg">{msg.text}</span>}
-          {dirty && !msg && <span className="text-xs text-amber-400">есть несохранённые изменения</span>}
+          {msg && <span className={cn('text-sm', msg.ok ? 'text-green-600' : 'text-red-600')} role="status" data-testid="save-msg">{msg.text}</span>}
+          {dirty && !msg && <span className="text-xs text-amber-600">есть несохранённые изменения</span>}
           <button className="btn btn-primary btn-sm" onClick={save} disabled={busy} data-testid="save">{busy ? 'Сохраняем…' : 'Сохранить'}</button>
         </div>
       </div>
@@ -99,7 +117,7 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
             <option value="unverified">unverified — права не подтверждены (скрыт от пользователей)</option>
           </select>
           {f.rights_status === 'dgt_official' && (
-            <p className="mt-1 text-xs text-amber-400" data-testid="official-warning">
+            <p className="mt-1 text-xs text-amber-600" data-testid="official-warning">
               DGT разрешает использовать свои материалы только без изменения содержания. Если правите формулировку или варианты — переведите вопрос в own. Переводы и пояснения добавлять можно.
             </p>
           )}
@@ -127,6 +145,7 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
               Загрузить файл
               <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
             </label>
+            {f.image_url && <button type="button" className="btn btn-ghost btn-sm" onClick={download} data-testid="image-download">Скачать на компьютер</button>}
             {f.image_url && <button className="text-xs text-slate-500 underline" onClick={() => set({ image_url: '' })}>убрать</button>}
           </div>
         </div>
@@ -141,7 +160,7 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
         <div className="mb-3 flex flex-wrap gap-1">
           {(['es', 'en', 'ru', 'hy'] as L[]).map((l) => (
             <button key={l} onClick={() => setTab(l)} data-testid={`tab-${l}`}
-              className={cn('rounded-xl px-4 py-2 text-sm font-semibold', tab === l ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-400')}>
+              className={cn('rounded-xl px-4 py-2 text-sm font-semibold', tab === l ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400')}>
               {l.toUpperCase()} {filled(l) ? (f.i18n[l]!.status === 'reviewed' ? '✓' : '•') : '—'}
             </button>
           ))}
@@ -178,7 +197,7 @@ export default function QuestionEditor({ initial, topics }: { initial: EditorIni
           </div>
           {(['a', 'b', 'c'] as const).map((k) => (
             <div key={k}>
-              <label className="label" htmlFor={`t-${k}`}>Вариант {k.toUpperCase()} {f.correct === k && <span className="text-green-400">· правильный</span>}{k === 'c' && <span className="text-slate-500"> · необязательно: пусто в ES = вопрос с двумя вариантами</span>}</label>
+              <label className="label" htmlFor={`t-${k}`}>Вариант {k.toUpperCase()} {f.correct === k && <span className="text-green-600">· правильный</span>}{k === 'c' && <span className="text-slate-500"> · необязательно: пусто в ES = вопрос с двумя вариантами</span>}</label>
               <input id={`t-${k}`} className={cn('input', f.correct === k && 'border-green-600/60')} value={cur[k]} onChange={(e) => setTr(tab, { [k]: e.target.value } as Partial<T>)} data-testid={`t-${k}`} />
             </div>
           ))}

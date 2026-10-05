@@ -3,25 +3,28 @@ import { ArrowRight, Lock } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
 import { listTests } from '@/lib/repo/content';
+import { getPricing } from '@/lib/repo/config';
 import { TEST_COUNT, currentTest, canOpenTest } from '@/lib/engine';
 import InstallHint from '@/components/InstallHint';
-import { formatDate, plural } from '@/lib/utils';
+import StatsModal from '@/components/StatsModal';
+import { formatDate, formatPrice, plural } from '@/lib/utils';
 
 export const metadata = { title: 'Главная' };
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [stats, tests] = await Promise.all([getStats(user.id), listTests(user.id)]);
-  const acc = accessInfo(user);
+  const [stats, tests, acc, pricing] = await Promise.all([getStats(user.id), listTests(user.id), accessInfo(user), getPricing()]);
   const officialTests = tests.filter((t) => t.category === 'official');
   const passed = officialTests.filter((t) => t.status === 'passed').length;
   const total = Math.max(officialTests.length, 1);
   const cur = currentTest(tests);
-  const curAllowed = cur ? canOpenTest('official', cur, acc.paid, acc.freeTests) : true;
+  const curAllowed = cur ? canOpenTest('official', cur, acc) : true;
+  const readiness = Math.max(0, Math.min(100, Math.round(0.5 * (passed / total) * 100 + 0.5 * stats.accuracy_last30)));
+  const priceText = formatPrice(pricing, user.trans_lang);
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Привет, {user.display_name?.split(' ')[0] ?? 'друг'}</h1>
           <p className="text-sm text-slate-400">
@@ -32,10 +35,14 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      <div className="mb-6">
+        <StatsModal stats={stats} readiness={readiness} />
+      </div>
+
       <div className="grid grid-cols-3 gap-3">
         <Stat value={stats.total_answers} label="Всего ответов" tone="text-brand-400" testid="stat-answers" />
-        <Stat value={`${stats.accuracy}%`} label="Точность" tone="text-green-400" />
-        <Stat value={`${passed}/${officialTests.length || TEST_COUNT}`} label="Тестов сдано" tone="text-amber-400" />
+        <Stat value={`${stats.accuracy}%`} label="Точность" tone="text-green-600" />
+        <Stat value={`${passed}/${officialTests.length || TEST_COUNT}`} label="Тестов сдано" tone="text-amber-600" />
       </div>
 
       <div className="mt-6">
@@ -43,7 +50,7 @@ export default async function DashboardPage() {
           <span>Прогресс</span>
           <span>{Math.round((passed / total) * 100)}%</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
           <div className="h-full rounded-full bg-brand-500" style={{ width: `${(passed / total) * 100}%` }} />
         </div>
       </div>
@@ -62,7 +69,7 @@ export default async function DashboardPage() {
             </Link>
           )
         ) : (
-          <div className="card p-5 text-center text-green-400">Все доступные тесты сданы 🎉</div>
+          <div className="card p-5 text-center text-green-600">Все доступные тесты сданы 🎉</div>
         )}
 
         <Link href="/errors" className="card flex items-center justify-between p-4 hover:bg-ink-800" data-testid="link-errors">
@@ -70,7 +77,7 @@ export default async function DashboardPage() {
             <div className="font-medium">Раздел ошибок</div>
             <div className="text-xs text-slate-400">По 5 вопросов, в которых вы ошибались</div>
           </div>
-          <span className={stats.errors_open ? 'rounded-full bg-red-500/15 px-3 py-1 text-sm font-semibold text-red-300' : 'text-sm text-slate-500'}>
+          <span className={stats.errors_open ? 'rounded-full bg-red-500/15 px-3 py-1 text-sm font-semibold text-red-700' : 'text-sm text-slate-500'}>
             {stats.errors_open}
           </span>
         </Link>
@@ -78,7 +85,7 @@ export default async function DashboardPage() {
 
       <div className="card mt-6 p-4 text-sm">
         {acc.paid ? (
-          <p className="text-slate-300">
+          <p className="text-slate-700">
             Доступ открыт до <b>{formatDate(user.access_until)}</b>{' '}
             <span className="text-slate-500">
               (осталось {acc.daysLeft} {plural(acc.daysLeft, 'день', 'дня', 'дней')})
@@ -87,7 +94,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex items-center justify-between gap-3">
             <p className="text-slate-400">
-              Бесплатно доступно {acc.freeTests > 0 ? `тестов: ${acc.freeTests}` : 'демо'}. Полный доступ — 50 € на 100 дней.
+              Бесплатно: 1 тест в день (из первых 20). Полный доступ — {priceText} на 100 дней.
             </p>
             <Link href="/pay" className="btn btn-primary btn-sm shrink-0">
               Открыть

@@ -11,12 +11,12 @@ export default async function AdminUsers({ searchParams }: { searchParams: { q?:
       <form className="mb-4"><input name="q" defaultValue={searchParams.q} placeholder="Имя, @username или Telegram ID" className="input max-w-sm" /></form>
       <div className="card overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-800 text-xs text-slate-500">
+          <thead className="border-b border-slate-200 text-xs text-slate-500">
             <tr><th className="p-3">Пользователь</th><th className="p-3">Доступ до</th><th className="p-3">Ответов</th><th className="p-3">Тестов</th><th className="p-3">Ошибок</th><th className="p-3">Регистрация</th><th className="p-3">Дни</th></tr>
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-b border-slate-800/60" data-testid="user-row">
+              <tr key={u.id} className="border-b border-slate-200/60" data-testid="user-row">
                 <td className="p-3">
                   <div className="font-medium">{u.display_name}{u.is_admin && <span className="ml-2 rounded bg-brand-600/30 px-1.5 text-[10px] text-brand-400">admin</span>}</div>
                   <div className="text-xs text-slate-500">{u.telegram_username ? `@${u.telegram_username} · ` : ''}{u.telegram_id}{!u.notify && ' · без рассылки'}</div>

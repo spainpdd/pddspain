@@ -32,11 +32,6 @@ export const env = {
       .map((s) => Number(s.trim()))
       .filter((n) => Number.isFinite(n) && n > 0);
   },
-  /** Сколько первых тестов открыто без оплаты (0 — всё платно) */
-  get freeTests() {
-    const n = Number(process.env.FREE_TESTS ?? '1');
-    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 1;
-  },
   /** Отдавать ли пользователям вопросы со статусом прав unverified (по умолчанию — нет) */
   get serveUnverified() {
     return bool(process.env.SERVE_UNVERIFIED_QUESTIONS, false);

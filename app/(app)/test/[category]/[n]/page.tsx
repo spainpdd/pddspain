@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getTestQuestions, listTests } from '@/lib/repo/content';
+import { registerFreeAccess } from '@/lib/repo/progress';
 import { canOpenTest, nextAfter } from '@/lib/engine';
 import { TEST_CATEGORIES, type TestCategory } from '@/lib/types';
 import TestPlayer from '@/components/TestPlayer';
@@ -18,8 +19,9 @@ export default async function TestPage({ params }: { params: { category: string;
   const item = tests.find((t) => t.category === category && t.number === n);
   if (!item) notFound();
   if (item.status === 'locked') redirect('/test');
-  const acc = accessInfo(user);
-  if (!canOpenTest(category, n, acc.paid, acc.freeTests)) redirect('/pay');
+  const acc = await accessInfo(user);
+  if (!canOpenTest(category, n, acc)) redirect('/pay');
+  await registerFreeAccess(user.id, category, n, acc);
 
   const questions = await getTestQuestions(category, n);
   if (!questions.length) notFound();

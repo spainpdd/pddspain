@@ -19,7 +19,7 @@ export default async function TopicsPage() {
               <Link href={t.topic ? `/admin/questions?topic=${encodeURIComponent(t.topic)}` : '/admin/questions'} className="min-w-[8rem] font-medium hover:text-brand-400">
                 {t.topic ?? <span className="text-slate-500">без темы</span>}
               </Link>
-              <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{t.n}</span>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-400">{t.n}</span>
             </div>
             {t.topic && <RenameTopic topic={t.topic} topics={names} />}
           </div>

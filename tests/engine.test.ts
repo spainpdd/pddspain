@@ -59,11 +59,19 @@ describe('доступ', () => {
     expect(hasPaidAccess('2026-09-20T00:00:00Z', now)).toBe(false);
     expect(hasPaidAccess('2026-09-22T00:00:00Z', now)).toBe(true);
   });
-  it('canOpenTest: бесплатные тесты открыты всем', () => {
-    expect(canOpenTest('official', 1, false, 1)).toBe(true);
-    expect(canOpenTest('official', 2, false, 1)).toBe(false);
-    expect(canOpenTest('official', 2, true, 1)).toBe(true);
-    expect(canOpenTest('official', 1, false, 0)).toBe(false);
+  it('canOpenTest: mixed всегда открыт, paid — всё открыто', () => {
+    expect(canOpenTest('mixed', 50, { paid: false, todayFreeTest: null })).toBe(true);
+    expect(canOpenTest('official', 2, { paid: true, todayFreeTest: null })).toBe(true);
+  });
+  it('canOpenTest: без оплаты — один бесплатный тест в день из первых 20', () => {
+    const noFree = { paid: false, todayFreeTest: null };
+    expect(canOpenTest('official', 1, noFree)).toBe(true);
+    expect(canOpenTest('official', 20, noFree)).toBe(true);
+    expect(canOpenTest('official', 21, noFree)).toBe(false);
+    // уже выбран тест 5 сегодня — он и только он доступен
+    const picked5 = { paid: false, todayFreeTest: 5 };
+    expect(canOpenTest('official', 5, picked5)).toBe(true);
+    expect(canOpenTest('official', 7, picked5)).toBe(false);
   });
   it('extendAccess: прибавляет к текущему сроку, а истёкший считает от сегодня', () => {
     expect(extendAccess('2026-10-01T10:00:00Z', 100, now).toISOString()).toBe('2027-01-09T10:00:00.000Z');

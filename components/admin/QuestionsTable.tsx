@@ -21,7 +21,7 @@ const RIGHTS: Record<string, [string, string]> = {
   own: ['свой', 'text-green-300'],
   dgt_official: ['DGT', 'text-green-300'],
   licensed: ['лицензия', 'text-green-300'],
-  unverified: ['не подтв.', 'text-amber-300'],
+  unverified: ['не подтв.', 'text-amber-700'],
 };
 
 export default function QuestionsTable({ rows, topics }: { rows: Row[]; topics: string[] }) {
@@ -71,7 +71,7 @@ export default function QuestionsTable({ rows, topics }: { rows: Row[]; topics: 
 
       <div className="card overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-800 text-xs text-slate-500">
+          <thead className="border-b border-slate-200 text-xs text-slate-500">
             <tr>
               <th className="p-3"><input type="checkbox" checked={all} onChange={() => setSel(all ? new Set() : new Set(rows.map((r) => r.id)))} aria-label="Выбрать все" /></th>
               <th className="p-3">Вопрос (ES)</th><th className="p-3">Тема</th><th className="p-3">Права</th>
@@ -80,7 +80,7 @@ export default function QuestionsTable({ rows, topics }: { rows: Row[]; topics: 
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className={cn('border-b border-slate-800/60 hover:bg-ink-800', !r.is_active && 'opacity-50')} data-testid="q-row">
+              <tr key={r.id} className={cn('border-b border-slate-200/60 hover:bg-ink-800', !r.is_active && 'opacity-50')} data-testid="q-row">
                 <td className="p-3"><input type="checkbox" checked={sel.has(r.id)} onChange={() => toggle(r.id)} aria-label="Выбрать" /></td>
                 <td className="max-w-md p-3">
                   <Link href={`/admin/questions/${r.id}`} className="line-clamp-2 hover:text-brand-400">{r.text_es ?? '—'}</Link>
@@ -94,7 +94,7 @@ export default function QuestionsTable({ rows, topics }: { rows: Row[]; topics: 
                   <div className="flex gap-1 text-[10px] font-semibold">
                     {(['es', 'en', 'ru', 'hy'] as const).map((l) => {
                       const st = r.langs?.[l];
-                      return <span key={l} title={st === 'reviewed' ? 'проверен' : st ? 'не проверен' : 'нет'} className={cn('rounded px-1.5 py-0.5', st === 'reviewed' ? 'bg-green-500/20 text-green-300' : st ? 'bg-amber-500/15 text-amber-300' : 'bg-slate-800 text-slate-600')}>{l.toUpperCase()}</span>;
+                      return <span key={l} title={st === 'reviewed' ? 'проверен' : st ? 'не проверен' : 'нет'} className={cn('rounded px-1.5 py-0.5', st === 'reviewed' ? 'bg-green-500/20 text-green-300' : st ? 'bg-amber-500/15 text-amber-700' : 'bg-slate-100 text-slate-600')}>{l.toUpperCase()}</span>;
                     })}
                   </div>
                 </td>

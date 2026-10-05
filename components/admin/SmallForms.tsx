@@ -43,7 +43,7 @@ export function SlotEditor({ category, n, pos, current }: { category: string; n:
     <div className="flex items-center gap-2">
       <input value={val} onChange={(e) => setVal(e.target.value)} className="input !w-72 font-mono !text-xs" aria-label="ID вопроса" />
       <button className="btn btn-ghost btn-sm" onClick={go} disabled={val === current}>Заменить</button>
-      {msg && <span className={msg.ok ? 'text-xs text-green-400' : 'text-xs text-red-400'}>{msg.t}</span>}
+      {msg && <span className={msg.ok ? 'text-xs text-green-600' : 'text-xs text-red-600'}>{msg.t}</span>}
     </div>
   );
 }

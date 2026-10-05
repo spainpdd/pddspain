@@ -1,6 +1,6 @@
 import { getDb, type Queryable } from '../db';
 import { env } from '../env';
-import { computeStatuses, dailyIndex } from '../engine';
+import { computeStatuses, dailyIndex, FREE_TEST_POOL } from '../engine';
 import type { Content, Lang, PlayerQuestion, TestCategory, TestListItem } from '../types';
 
 export async function loadPlayerQuestions(
@@ -93,8 +93,8 @@ export async function listTests(userId: string, q?: Queryable): Promise<TestList
       attempts: p?.attempts ?? 0,
       best_errors: p?.best_errors ?? null,
       last_errors: p?.last_errors ?? null,
-      // «mixed» — без платного доступа, бесплатны все
-      free: t.category === 'mixed' ? true : t.number <= env.freeTests,
+      // «mixed» — без платного доступа, бесплатны все; «official» — в пуле «1 бесплатный тест в день»
+      free: t.category === 'mixed' ? true : t.number <= FREE_TEST_POOL,
     };
   });
 }

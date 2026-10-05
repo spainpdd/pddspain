@@ -10,10 +10,10 @@ export default async function AdminClaims() {
       <p className="mb-5 text-sm text-slate-400">Пользователь отмечает «не сдал» — доступ продлевается автоматически. Если данные сомнительны, отзовите заявку: добавленные дни вернутся обратно.</p>
       <div className="card overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-800 text-xs text-slate-500"><tr><th className="p-3">Пользователь</th><th className="p-3">Дата экзамена</th><th className="p-3">Результат</th><th className="p-3">Дней</th><th className="p-3">Подана</th><th className="p-3" /></tr></thead>
+          <thead className="border-b border-slate-200 text-xs text-slate-500"><tr><th className="p-3">Пользователь</th><th className="p-3">Дата экзамена</th><th className="p-3">Результат</th><th className="p-3">Дней</th><th className="p-3">Подана</th><th className="p-3" /></tr></thead>
           <tbody>
             {claims.map((c: any) => (
-              <tr key={c.id} className={`border-b border-slate-800/60 ${c.revoked ? 'opacity-40 line-through' : ''}`}>
+              <tr key={c.id} className={`border-b border-slate-200/60 ${c.revoked ? 'opacity-40 line-through' : ''}`}>
                 <td className="p-3">{c.display_name}{c.telegram_username ? ` (@${c.telegram_username})` : ''}</td>
                 <td className="p-3">{formatDate(c.exam_date + 'T12:00:00Z')}</td>
                 <td className="p-3">{c.result === 'passed' ? 'сдал' : 'не сдал'}</td>

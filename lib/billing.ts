@@ -5,6 +5,7 @@ import { env } from './env';
 import { ACCESS_DAYS, PRICE_CENTS } from './engine';
 import { recordPayment } from './repo/billing';
 import { getProfile } from './repo/users';
+import { getPricing } from './repo/config';
 import { notifyPaid } from './bot';
 import type { Profile } from './types';
 
@@ -18,6 +19,7 @@ export const stripeConfigured = () => !!env.stripeSecret;
 export async function createCheckoutUrl(user: Profile): Promise<string> {
   const stripe = stripeClient();
   const priceId = process.env.STRIPE_PRICE_ID;
+  const pricing = priceId ? null : await getPricing();
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     client_reference_id: user.id,
@@ -29,7 +31,7 @@ export async function createCheckoutUrl(user: Profile): Promise<string> {
             quantity: 1,
             price_data: {
               currency: 'eur',
-              unit_amount: PRICE_CENTS,
+              unit_amount: pricing?.eur_cents ?? PRICE_CENTS,
               product_data: {
                 name: `DGT Права — доступ на ${ACCESS_DAYS} дней`,
                 description: 'Все тесты, раздел ошибок, переводы RU/HY. Гарантия: доступ продлевается, пока не сдадите экзамен.',

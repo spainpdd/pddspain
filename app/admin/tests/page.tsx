@@ -27,7 +27,7 @@ export default async function AdminTests() {
                 className={cn('card p-3 text-center hover:bg-ink-800', t.playable < TEST_SIZE && 'border-red-500/40')}
               >
                 <div className="text-lg font-bold">{t.number}</div>
-                <div className={cn('text-[11px]', t.playable < TEST_SIZE ? 'text-red-300' : 'text-slate-500')}>{t.playable}/{t.slots}</div>
+                <div className={cn('text-[11px]', t.playable < TEST_SIZE ? 'text-red-700' : 'text-slate-500')}>{t.playable}/{t.slots}</div>
               </Link>
             ))}
             {byCategory[cat].length === 0 && <div className="card col-span-full p-6 text-center text-slate-500">Тестов пока нет</div>}

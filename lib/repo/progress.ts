@@ -1,9 +1,36 @@
 import { getDb } from '../db';
 import { env } from '../env';
-import { ERRORS_BATCH, evaluateTest, isPassed, nextAfter, pickErrorBatch } from '../engine';
+import { ERRORS_BATCH, evaluateTest, FREE_TEST_POOL, isPassed, madridDateKey, nextAfter, pickErrorBatch } from '../engine';
 import { getQuestionsByIds, getTestQuestions, listTests } from './content';
 import type { AnswerMap, Choice, PlayerQuestion, SubmitResult, TestCategory } from '../types';
-import { isChoice } from '../engine';
+import { isChoice, type FreeAccess } from '../engine';
+
+/** Бесплатный тест, уже выбранный пользователем сегодня (по Мадриду), если есть */
+export async function getTodayFreeTest(userId: string): Promise<number | null> {
+  const db = await getDb();
+  const rows = await db.query<{ test_number: number }>(
+    `select test_number from daily_free_test where user_id = $1 and free_date = $2`,
+    [userId, madridDateKey()],
+  );
+  return rows[0]?.test_number ?? null;
+}
+
+/** Закрепляет выбор «сегодняшнего» бесплатного теста (идемпотентно) */
+async function claimTodayFreeTest(userId: string, n: number): Promise<void> {
+  const db = await getDb();
+  await db.query(
+    `insert into daily_free_test (user_id, free_date, test_number) values ($1, $2, $3)
+     on conflict (user_id, free_date) do nothing`,
+    [userId, madridDateKey(), n],
+  );
+}
+
+/** Вызывать сразу после успешной проверки canOpenTest — фиксирует бесплатный выбор дня, если он ещё не сделан */
+export async function registerFreeAccess(userId: string, category: TestCategory, n: number, acc: FreeAccess): Promise<void> {
+  if (category === 'official' && !acc.paid && n <= FREE_TEST_POOL && acc.todayFreeTest === null) {
+    await claimTodayFreeTest(userId, n);
+  }
+}
 
 export class RuleError extends Error {
   constructor(public code: string, message?: string) {

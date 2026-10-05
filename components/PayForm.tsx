@@ -34,8 +34,8 @@ export default function PayForm({ configured }: { configured: boolean }) {
       <button className="btn btn-primary w-full text-lg" disabled={!consent || busy || !configured} onClick={pay} data-testid="pay-btn">
         {busy ? 'Переходим к оплате…' : 'Оплатить 50 €'}
       </button>
-      {!configured && <p className="text-xs text-amber-400">Оплата ещё не настроена (нет STRIPE_SECRET_KEY).</p>}
-      {err && <p className="text-sm text-red-400">{err}</p>}
+      {!configured && <p className="text-xs text-amber-600">Оплата ещё не настроена (нет STRIPE_SECRET_KEY).</p>}
+      {err && <p className="text-sm text-red-600">{err}</p>}
     </div>
   );
 }

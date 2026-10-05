@@ -12,6 +12,7 @@ const nav = [
   ['/admin/tests', 'Тесты'],
   ['/admin/users', 'Пользователи'],
   ['/admin/claims', 'Гарантия'],
+  ['/admin/pricing', 'Цены'],
   ['/admin/data', 'Импорт / экспорт'],
 ];
 
@@ -24,12 +25,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           Включён SERVE_UNVERIFIED_QUESTIONS: пользователям показываются вопросы с непроверенными правами. Не оставляйте так на боевом сайте.
         </div>
       )}
-      <header className="border-b border-slate-800">
+      <header className="border-b border-slate-200">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
-          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-300">← Приложение</Link>
+          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-700">← Приложение</Link>
           <nav className="flex flex-wrap gap-1">
             {nav.map(([href, label]) => (
-              <Link key={href} href={href} className="rounded-lg px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800">{label}</Link>
+              <Link key={href} href={href} className="rounded-lg px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100">{label}</Link>
             ))}
           </nav>
         </div>

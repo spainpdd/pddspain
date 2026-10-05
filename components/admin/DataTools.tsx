@@ -63,9 +63,9 @@ export default function DataTools() {
           </div>
         )}
         {report && (
-          <pre className="max-h-64 overflow-auto rounded-xl bg-ink p-3 text-xs text-slate-300" data-testid="import-report">{JSON.stringify(report, null, 2)}</pre>
+          <pre className="max-h-64 overflow-auto rounded-xl bg-ink p-3 text-xs text-slate-700" data-testid="import-report">{JSON.stringify(report, null, 2)}</pre>
         )}
-        {msg && <p className="text-sm text-amber-300" data-testid="data-msg">{msg}</p>}
+        {msg && <p className="text-sm text-amber-700" data-testid="data-msg">{msg}</p>}
       </section>
 
       <section className="card space-y-3 p-5">

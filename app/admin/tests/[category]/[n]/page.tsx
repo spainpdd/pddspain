@@ -14,7 +14,7 @@ export default async function AdminTest({ params }: { params: { category: string
   if (!slots.length) notFound();
   return (
     <div>
-      <Link href="/admin/tests" className="text-sm text-slate-500 hover:text-slate-300">← Все тесты</Link>
+      <Link href="/admin/tests" className="text-sm text-slate-500 hover:text-slate-700">← Все тесты</Link>
       <h1 className="mb-1 mt-2 text-2xl font-bold">
         Тест {n} <span className="text-base font-normal text-slate-500">({category === 'official' ? 'официальный' : 'дополнительный'})</span>
       </h1>

@@ -49,7 +49,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   return (
     <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="flex w-full items-center justify-between text-left text-sm">
       <span>{label}</span>
-      <span className={cn('h-6 w-11 rounded-full p-0.5 transition', checked ? 'bg-brand-600' : 'bg-slate-700')}>
+      <span className={cn('h-6 w-11 rounded-full p-0.5 transition', checked ? 'bg-brand-600' : 'bg-slate-300')}>
         <span className={cn('block h-5 w-5 rounded-full bg-white transition', checked && 'translate-x-5')} />
       </span>
     </button>
@@ -95,7 +95,7 @@ export function ClaimForm() {
         <button disabled={busy} className="btn btn-ghost btn-sm" onClick={() => send('failed')}>Не сдал(а)</button>
         <button disabled={busy} className="btn btn-primary btn-sm" onClick={() => send('passed')}>Сдал(а)!</button>
       </div>
-      {msg && <p className={cn('text-sm', msg.ok ? 'text-green-400' : 'text-red-400')}>{msg.text}</p>}
+      {msg && <p className={cn('text-sm', msg.ok ? 'text-green-600' : 'text-red-600')}>{msg.text}</p>}
     </div>
   );
 }

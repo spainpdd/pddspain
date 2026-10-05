@@ -123,17 +123,17 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
   const pct = ((idx + (chosen ? 1 : 0)) / questions.length) * 100;
 
   const chip = (active: boolean) =>
-    cn('chip', active ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200');
+    cn('chip', active ? 'bg-brand-600 text-white' : 'bg-white text-slate-500 hover:text-slate-900');
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-ink" data-testid="runner">
       {/* верхняя панель */}
       <div className="pt-safe px-4">
         <div className="mx-auto flex max-w-lg items-center gap-3 pb-2">
-          <button onClick={onExit} aria-label="Выйти" className="-ml-1 rounded-full p-1.5 text-slate-400 hover:text-white">
+          <button onClick={onExit} aria-label="Выйти" className="-ml-1 rounded-full p-1.5 text-slate-400 hover:text-slate-900">
             <X size={22} />
           </button>
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
             <div className="h-full rounded-full bg-brand-500 transition-all duration-300" style={{ width: `${pct}%` }} />
           </div>
           <span className="text-xs tabular-nums text-slate-400" data-testid="counter">
@@ -142,15 +142,15 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
         </div>
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2 pb-3">
           <div className="flex items-center gap-1.5">
-            <div className="flex gap-1 rounded-full bg-slate-900 p-0.5">
+            <div className="flex gap-1 rounded-full bg-slate-100 p-0.5">
               {(['es', 'en'] as StudyLang[]).map((l) => (
                 <button key={l} className={chip(lang.study === l)} onClick={() => onLang({ ...lang, study: l })} data-testid={`study-${l}`}>
                   {l.toUpperCase()}
                 </button>
               ))}
             </div>
-            <span className="text-slate-700">→</span>
-            <div className="flex gap-1 rounded-full bg-slate-900 p-0.5">
+            <span className="text-slate-400">→</span>
+            <div className="flex gap-1 rounded-full bg-slate-100 p-0.5">
               {(['ru', 'hy'] as TransLang[]).map((l) => {
                 const active = lang.showTrans && lang.trans === l;
                 return (
@@ -170,7 +170,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
           <div className="flex items-center gap-2 text-xs">
             {label && <span className="text-slate-500">{label}</span>}
             {countErrors && (
-              <span className={cn('rounded-full px-2 py-1 font-semibold', wrongSoFar > MAX_ERRORS ? 'bg-red-500/20 text-red-300' : wrongSoFar ? 'bg-amber-500/15 text-amber-300' : 'bg-slate-900 text-slate-500')} data-testid="err-chip">
+              <span className={cn('rounded-full px-2 py-1 font-semibold', wrongSoFar > MAX_ERRORS ? 'bg-red-500/15 text-red-700' : wrongSoFar ? 'bg-amber-500/15 text-amber-700' : 'bg-slate-100 text-slate-500')} data-testid="err-chip">
                 Ошибок: {wrongSoFar}
               </span>
             )}
@@ -190,7 +190,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
 
           <div className="rise">
             <p className="text-question font-medium" data-testid="q-text">{study?.text}</p>
-            {tr && <p className="mt-2 text-[0.95rem] leading-relaxed text-brand-400" data-testid="q-text-tr">{tr.text}</p>}
+            {tr && <p className="mt-2 text-[0.95rem] leading-relaxed text-brand-600" data-testid="q-text-tr">{tr.text}</p>}
             {missingTr && <p className="mt-2 text-xs text-slate-500">Перевода на {trans.toUpperCase()} пока нет — показан оригинал.</p>}
           </div>
 
@@ -208,23 +208,23 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
                   data-state={done ? (isRight ? 'right' : isChosen ? 'wrong' : 'idle') : 'idle'}
                   className={cn(
                     'flex w-full items-start gap-3 rounded-2xl border-2 px-3.5 py-3.5 text-left transition active:scale-[0.99]',
-                    !done && 'border-slate-800 bg-ink-900 hover:border-brand-500',
+                    !done && 'border-slate-200 bg-ink-900 hover:border-brand-500',
                     done && isRight && 'border-green-500 bg-green-500/15',
                     done && isChosen && !isRight && 'border-red-500 bg-red-500/15',
-                    done && !isChosen && !isRight && 'border-slate-800/70 bg-ink-900/40 opacity-60',
+                    done && !isChosen && !isRight && 'border-slate-200/70 bg-ink-900/40 opacity-60',
                   )}
                 >
                   <span
                     className={cn(
                       'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                      done && isRight ? 'bg-green-500 text-white' : done && isChosen ? 'bg-red-500 text-white' : 'bg-slate-800 text-slate-300',
+                      done && isRight ? 'bg-green-500 text-white' : done && isChosen ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500',
                     )}
                   >
                     {done && isRight ? <Check size={16} strokeWidth={3} /> : c.toUpperCase()}
                   </span>
                   <span className="flex-1">
                     <span className="block text-[0.98rem] leading-snug">{study?.[c]}</span>
-                    {tr && <span className="mt-1 block text-sm leading-snug text-brand-400" data-testid={`opt-${c}-tr`}>{tr[c]}</span>}
+                    {tr && <span className="mt-1 block text-sm leading-snug text-brand-600" data-testid={`opt-${c}-tr`}>{tr[c]}</span>}
                   </span>
                 </button>
               );
@@ -232,7 +232,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
           </div>
 
           {q.official && (
-            <p className="mt-4 text-[11px] leading-snug text-slate-600" data-testid="source-dgt">
+            <p className="mt-4 text-[11px] leading-snug text-slate-500" data-testid="source-dgt">
               Fuente: {DGT_SOURCE_NAME} ·{' '}
               <a href={DGT_SITE} target="_blank" rel="noopener noreferrer" className="underline">sede.dgt.gob.es</a>
               . Перевод неофициальный.
@@ -241,23 +241,23 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
 
           {/* пояснение открывается сразу после выбора ответа */}
           {chosen && (
-            <div ref={explRef} className="rise mt-5 rounded-2xl border border-slate-700 bg-ink-800 p-4" data-testid="explanation">
-              <p className={cn('mb-1.5 text-sm font-semibold', chosen === q.correct ? 'text-green-400' : 'text-red-400')}>
+            <div ref={explRef} className="rise mt-5 rounded-2xl border border-slate-200 bg-ink-800 p-4" data-testid="explanation">
+              <p className={cn('mb-1.5 text-sm font-semibold', chosen === q.correct ? 'text-green-600' : 'text-red-600')}>
                 {chosen === q.correct ? 'Верно' : `Неверно · правильный ответ ${q.correct.toUpperCase()}`}
               </p>
               {study?.explanation ? (
-                <p className="text-sm leading-relaxed text-slate-200">{study.explanation}</p>
+                <p className="text-sm leading-relaxed text-slate-700">{study.explanation}</p>
               ) : (
                 !tr?.explanation && <p className="text-sm text-slate-500">Для этого вопроса пояснение пока не добавлено.</p>
               )}
-              {tr?.explanation && <p className="mt-2 text-sm leading-relaxed text-brand-400" data-testid="explanation-tr">{tr.explanation}</p>}
+              {tr?.explanation && <p className="mt-2 text-sm leading-relaxed text-brand-600" data-testid="explanation-tr">{tr.explanation}</p>}
             </div>
           )}
         </div>
       </div>
 
       {/* «Далее» */}
-      <div className="border-t border-slate-800 bg-ink/95 px-4 pb-safe pt-3 backdrop-blur">
+      <div className="border-t border-slate-200 bg-ink/95 px-4 pb-safe pt-3 backdrop-blur">
         <div className="mx-auto max-w-lg">
           <button className="btn btn-primary w-full" disabled={!chosen} onClick={next} data-testid="next">
             {last ? finishLabel ?? 'Завершить' : 'Далее'}
