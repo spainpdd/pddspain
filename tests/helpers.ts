@@ -1,9 +1,16 @@
 import { createPglite, applyMigrations, setDb, type Db } from '../lib/db';
 import { upsertTelegramUser } from '../lib/repo/users';
 
-export async function makeDb(): Promise<Db> {
+/**
+ * Чистая база после миграций. Стартовое содержимое, которое засевают миграции (вопросы и тесты 009),
+ * по умолчанию убирается, чтобы тесты сами задавали нужный набор. Тесты самих миграций просят `{ seed: true }`.
+ */
+export async function makeDb(opts: { seed?: boolean } = {}): Promise<Db> {
   const db = await createPglite();
   await applyMigrations(db);
+  if (!opts.seed) {
+    await db.exec(`delete from test_questions; delete from tests; delete from questions where source = 'rd518-2026';`);
+  }
   setDb(db);
   return db;
 }
