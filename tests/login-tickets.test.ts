@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { Db } from '../lib/db';
 import { makeDb } from './helpers';
-import { createLoginTicket, confirmLoginTicket, getLoginTicket } from '../lib/repo/login-tickets';
+import { createLoginTicket, confirmLoginTicket, getLoginTicket, resolveLoginTicket } from '../lib/repo/login-tickets';
+import { upsertTelegramUser } from '../lib/repo/users';
 
 let db: Db;
 beforeEach(async () => {
@@ -39,5 +40,14 @@ describe('тикеты входа через бота', () => {
     await db.query(`update login_tickets set expires_at = now() - interval '1 second' where token = $1`, [token]);
     expect(await getLoginTicket(token)).toBeNull();
     expect(await confirmLoginTicket(token, 1)).toBe(false);
+  });
+
+  it('resolveLoginTicket: pending → expired → confirmed с id профиля для сессии', async () => {
+    expect(await resolveLoginTicket('does-not-exist')).toEqual({ status: 'expired' });
+    const token = await createLoginTicket();
+    expect(await resolveLoginTicket(token)).toEqual({ status: 'pending' });
+    const profile = await upsertTelegramUser({ id: 4242, first_name: 'Gar' });
+    await confirmLoginTicket(token, 4242);
+    expect(await resolveLoginTicket(token)).toEqual({ status: 'confirmed', profileId: profile.id });
   });
 });

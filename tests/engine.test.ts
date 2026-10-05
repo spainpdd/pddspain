@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   evaluateTest, computeStatuses, pickErrorBatch, extendAccess, decideClaim, dailyIndex,
-  madridDateKey, hasPaidAccess, canOpenTest, nextAfter, currentTest, readinessPercent, errorTone,
+  madridDateKey, hasPaidAccess, canOpenTest, nextAfter, currentTest, readinessPercent, errorTone, orderTests,
 } from '../lib/engine';
 
 describe('evaluateTest', () => {
@@ -85,6 +85,19 @@ describe('доступ', () => {
     expect(readinessPercent(90, 90)).toBe(100);
     expect(readinessPercent(0, 90)).toBe(0);
     expect(readinessPercent(5, 0)).toBe(0);
+  });
+  it('orderTests: официальные первыми, затем остальные; сквозная нумерация', () => {
+    const list = [
+      { category: 'mixed' as const, number: 2 },
+      { category: 'official' as const, number: 2 },
+      { category: 'mixed' as const, number: 1 },
+      { category: 'official' as const, number: 1 },
+      { category: 'official' as const, number: 3 },
+    ];
+    expect(orderTests(list).map((t) => `${t.category}${t.number}:${t.display}`)).toEqual([
+      'official1:1', 'official2:2', 'official3:3', 'mixed1:4', 'mixed2:5',
+    ]);
+    expect(orderTests([])).toEqual([]);
   });
   it('errorTone: цвет плитки по ошибкам', () => {
     expect(errorTone(null)).toBe('none');

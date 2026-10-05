@@ -64,13 +64,15 @@ export async function handleUpdate(update: any, tg: TgCall = callTelegram): Prom
     // Вход через бота напрямую (кнопка «Войти через Telegram» на сайте): /start login_<token>
     const payload = text.slice(cmd.length).trim();
     if (payload.startsWith('login_')) {
-      const confirmed = await confirmLoginTicket(payload.slice('login_'.length), m.from.id);
+      const ticketToken = payload.slice('login_'.length);
+      const confirmed = await confirmLoginTicket(ticketToken, m.from.id);
       if (confirmed) {
         await tg('sendMessage', {
           chat_id: chatId,
           parse_mode: 'HTML',
-          text: `✅ Вход подтверждён, ${esc(m.from.first_name || '')}! Вернитесь на сайт — вы уже авторизованы.\n\n${HELP}`,
-          reply_markup: openAppKeyboard('/dashboard'),
+          text: `✅ Вход подтверждён, ${esc(m.from.first_name || '')}! Вернитесь на сайт — вы уже авторизованы. Или нажмите кнопку ниже, чтобы открыть приложение здесь.\n\n${HELP}`,
+          // ссылка входит в аккаунт в том браузере, где её откроют (встроенный браузер Telegram, браузер на ПК)
+          reply_markup: openAppKeyboard(`/api/auth/telegram/ticket/${ticketToken}/enter`),
         });
         return;
       }

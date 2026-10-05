@@ -4,6 +4,7 @@
  */
 import crypto from 'node:crypto';
 import { getDb } from '../db';
+import { getProfileByTelegramId } from './users';
 
 export const LOGIN_TICKET_TTL_SEC = 600; // 10 минут
 
@@ -48,4 +49,17 @@ export async function getLoginTicket(token: string): Promise<LoginTicket | null>
   const r = rows[0];
   if (!r) return null;
   return { token: r.token, status: r.status as 'pending' | 'confirmed', telegram_id: r.telegram_id };
+}
+
+/**
+ * Подтверждён ли тикет и чей он: возвращает id профиля для выдачи сессии, иначе статус.
+ * Используется и поллингом со страницы входа, и «магической» ссылкой из кнопки бота.
+ */
+export async function resolveLoginTicket(token: string): Promise<{ status: 'confirmed'; profileId: string } | { status: 'pending' | 'expired' }> {
+  const ticket = await getLoginTicket(token);
+  if (!ticket) return { status: 'expired' };
+  if (ticket.status !== 'confirmed' || !ticket.telegram_id) return { status: 'pending' };
+  const profile = await getProfileByTelegramId(ticket.telegram_id);
+  if (!profile) return { status: 'pending' }; // защитный случай: не должен произойти
+  return { status: 'confirmed', profileId: profile.id };
 }

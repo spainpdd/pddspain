@@ -61,6 +61,16 @@ export function currentTest(list: Pick<TestListItem, 'category' | 'number' | 'st
   return list.find((t) => t.category === 'official' && t.status === 'available')?.number ?? null;
 }
 
+/**
+ * Единый список тестов для пользователя: сначала «official», потом «mixed» (каждая группа по номерам).
+ * `display` — сквозной номер в этом списке (1, 2, 3 …): именно он показывается на плитках и в плеере,
+ * потому что собственные номера в категориях пересекаются.
+ */
+export function orderTests<T extends { category: TestCategory; number: number }>(list: T[]): (T & { display: number })[] {
+  const byCat = (c: TestCategory) => list.filter((t) => t.category === c).sort((a, b) => a.number - b.number);
+  return [...byCat('official'), ...byCat('mixed')].map((t, i) => ({ ...t, display: i + 1 }));
+}
+
 /** Следующий по порядку тест после n (если он существует) */
 export function nextAfter(numbers: number[], n: number): number | null {
   const i = numbers.indexOf(n);

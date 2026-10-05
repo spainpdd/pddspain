@@ -14,7 +14,9 @@ interface Props {
   testNumber?: number;
   questions: PlayerQuestion[];
   settings: { study: StudyLang; trans: TransLang; auto: boolean };
-  nextTest?: number | null;
+  /** Номер, который видит пользователь (сквозной в общем списке); по умолчанию — testNumber */
+  displayNumber?: number;
+  nextTest?: { category: TestCategory; number: number; display: number } | null;
 }
 
 type Phase = 'play' | 'submitting' | 'result' | 'review' | 'reviewSaving' | 'reviewDone' | 'errorsResult';
@@ -26,7 +28,7 @@ async function post(url: string, body: unknown) {
   return data;
 }
 
-export default function TestPlayer({ mode, category, testNumber, questions, settings, nextTest }: Props) {
+export default function TestPlayer({ mode, category, testNumber, questions, settings, displayNumber, nextTest }: Props) {
   const router = useRouter();
   const [lang, setLang] = useState<LangState>({ study: settings.study, trans: settings.trans, showTrans: settings.auto });
   const [phase, setPhase] = useState<Phase>('play');
@@ -39,7 +41,9 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
   const lastAnswers = useRef<AnswerMap>({});
 
   const key = mode === 'test' ? `dgt:run:test:${category}:${testNumber}` : undefined;
-  const label = mode === 'test' ? `Тест ${testNumber}` : 'Ошибки';
+  const shownNumber = displayNumber ?? testNumber;
+  const label = mode === 'test' ? `Тест ${shownNumber}` : 'Ошибки';
+  const [askExit, setAskExit] = useState(false);
 
   const changeLang = useCallback((l: LangState) => {
     setLang(l);
@@ -48,6 +52,23 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
   }, []);
 
   const exit = () => router.push(mode === 'test' ? '/test' : '/dashboard');
+
+  /** Крестик в тесте: если уже есть ответы — спрашиваем, сохранить ход или удалить и начать с начала */
+  const requestExit = () => {
+    if (mode !== 'test' || !key) return exit();
+    let hasAnswers = false;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || 'null');
+      hasAnswers = !!saved && Object.keys(saved.answers ?? {}).length > 0;
+    } catch {}
+    if (hasAnswers) setAskExit(true);
+    else exit();
+  };
+  const exitKeep = () => exit();
+  const exitDiscard = () => {
+    clearSaved(key);
+    exit();
+  };
 
   const finishMain = useCallback(
     async (answers: AnswerMap) => {
@@ -103,7 +124,7 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
     setPhase('play');
   };
 
-  const goNext = () => router.push(nextTest ? `/test/${category}/${nextTest}` : '/test');
+  const goNext = () => router.push(nextTest ? `/test/${nextTest.category}/${nextTest.number}` : '/test');
 
   if (phase === 'play' || phase === 'submitting') {
     return (
@@ -114,13 +135,32 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
           lang={lang}
           onLang={changeLang}
           onFinish={finishMain}
-          onExit={exit}
+          onExit={requestExit}
           countErrors={mode === 'test'}
           label={label}
           persistKey={key}
           finishLabel={mode === 'test' ? 'Завершить тест' : 'Готово'}
         />
         {phase === 'submitting' && <Overlay>Проверяем результат…</Overlay>}
+        {askExit && phase === 'play' && (
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" data-testid="exit-dialog">
+            <div className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-8 shadow-2xl sm:rounded-3xl">
+              <h2 className="text-lg font-bold">Выйти из теста?</h2>
+              <p className="mt-1 text-sm text-slate-500">Что сделать с вашими ответами в этом тесте?</p>
+              <div className="mt-5 space-y-2.5">
+                <button className="btn btn-primary w-full" onClick={exitKeep} data-testid="exit-keep">
+                  Сохранить и продолжить позже
+                </button>
+                <button className="btn btn-ghost w-full text-red-600" onClick={exitDiscard} data-testid="exit-discard">
+                  Удалить ответы, начать с начала
+                </button>
+                <button className="btn btn-ghost w-full" onClick={() => setAskExit(false)} data-testid="exit-cancel">
+                  Остаться в тесте
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {err && (
           <div className="fixed inset-x-4 top-16 z-[60] mx-auto max-w-lg rounded-xl bg-red-600 px-4 py-3 text-sm text-white" role="alert">
             {err}. Ответы сохранены — нажмите «{mode === 'test' ? 'Завершить тест' : 'Готово'}» ещё раз.
@@ -166,10 +206,10 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
     return (
       <Screen>
         <CheckCircle2 size={64} className="text-green-500" />
-        <h1 className="mt-4 text-2xl font-bold">Тест {testNumber} сдан</h1>
+        <h1 className="mt-4 text-2xl font-bold">Тест {shownNumber} сдан</h1>
         <p className="mt-2 max-w-xs text-slate-400">Ошибки сохранены в раздел «Ошибки» — вы вернётесь к ним позже.</p>
         <Actions>
-          <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest}` : 'К списку тестов'}</button>
+          <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest.display}` : 'К списку тестов'}</button>
           <button className="btn btn-ghost w-full" onClick={() => router.push('/test')}>К списку тестов</button>
         </Actions>
       </Screen>
@@ -194,7 +234,7 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
           {r.outcome === 'fail' && `Ошибок: ${r.errors} из ${r.total}. Чтобы открыть следующий тест, нужно не больше ${MAX_ERRORS}.`}
         </p>
         <Actions>
-          {r.outcome === 'perfect' && <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest}` : 'К списку тестов'}</button>}
+          {r.outcome === 'perfect' && <button className="btn btn-primary w-full" onClick={goNext}>{nextTest ? `Тест ${nextTest.display}` : 'К списку тестов'}</button>}
           {r.outcome === 'pass_review' && <button className="btn btn-primary w-full" onClick={startReview}>Решить ошибки ({r.errors})</button>}
           {r.outcome === 'fail' && (
             <>

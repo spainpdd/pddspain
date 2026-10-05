@@ -40,10 +40,15 @@ describe('бот', () => {
   });
 
   it('/start login_<token> подтверждает вход через бота (кнопка на сайте) и отдельно приветствует', async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.test';
     const token = await createLoginTicket();
     await handleUpdate(msg(5559, `/start login_${token}`), tg);
     expect(await getLoginTicket(token)).toMatchObject({ status: 'confirmed', telegram_id: 5559 });
     expect(calls[0].payload.text).toContain('Вход подтверждён');
+    // кнопка «Открыть приложение» входит в аккаунт в любом браузере, где её откроют
+    const url = calls[0].payload.reply_markup?.inline_keyboard?.[0]?.[0]?.url as string | undefined;
+    expect(url).toBe(`https://example.test/api/auth/telegram/ticket/${token}/enter`);
+    delete process.env.NEXT_PUBLIC_SITE_URL;
   });
 
   it('/start с несуществующим/истёкшим тикетом не падает — обычное приветствие', async () => {
