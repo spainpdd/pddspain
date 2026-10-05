@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { DGT_BUYER_NOTICE } from '@/lib/legal-notes';
 
-export default function PayForm({ configured }: { configured: boolean }) {
+export default function PayForm({ configured, priceLabel, testMode }: { configured: boolean; priceLabel: string; testMode?: boolean }) {
   const [consent, setConsent] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -12,7 +12,7 @@ export default function PayForm({ configured }: { configured: boolean }) {
   const pay = async () => {
     setBusy(true);
     setErr(null);
-    const res = await fetch('/api/stripe/checkout', {
+    const res = await fetch('/api/pay/robokassa', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ consent, privacy }),
@@ -23,11 +23,18 @@ export default function PayForm({ configured }: { configured: boolean }) {
       return;
     }
     setBusy(false);
-    setErr(d.error === 'payments_not_configured' ? 'Оплата пока не подключена. Напишите нам — откроем доступ вручную.' : 'Не удалось начать оплату. Попробуйте ещё раз.');
+    setErr(
+      d.error === 'payments_not_configured'
+        ? 'Оплата пока не подключена. Напишите нам — откроем доступ вручную.'
+        : d.error === 'too_many_attempts'
+          ? 'Слишком много попыток. Подождите немного и попробуйте снова.'
+          : 'Не удалось начать оплату. Попробуйте ещё раз.',
+    );
   };
 
   return (
     <div className="space-y-4">
+      {testMode && <p className="rounded-lg bg-amber-50 p-2 text-xs text-amber-700">Тестовый режим оплаты: деньги не списываются.</p>}
       <label className="flex items-start gap-3 text-left text-xs leading-relaxed text-slate-400">
         <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600" checked={consent} onChange={(e) => setConsent(e.target.checked)} data-testid="consent" />
         <span>
@@ -47,9 +54,9 @@ export default function PayForm({ configured }: { configured: boolean }) {
       </label>
       <p className="text-[11px] leading-relaxed text-slate-500" data-testid="dgt-notice">{DGT_BUYER_NOTICE}</p>
       <button className="btn btn-primary w-full text-lg" disabled={!consent || !privacy || busy || !configured} onClick={pay} data-testid="pay-btn">
-        {busy ? 'Переходим к оплате…' : 'Оплатить 50 €'}
+        {busy ? 'Переходим к оплате…' : `Оплатить ${priceLabel}`}
       </button>
-      {!configured && <p className="text-xs text-amber-600">Оплата ещё не настроена (нет STRIPE_SECRET_KEY).</p>}
+      {!configured && <p className="text-xs text-amber-600">Оплата ещё не настроена.</p>}
       {err && <p className="text-sm text-red-600">{err}</p>}
     </div>
   );

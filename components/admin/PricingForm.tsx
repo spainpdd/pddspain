@@ -34,21 +34,21 @@ export function PricingForm({ pricing }: { pricing: Pricing }) {
   return (
     <div className="card max-w-md space-y-4 p-5">
       <div>
-        <label className="label">Цена в евро (реально списывает Stripe)</label>
+        <label className="label">Цена для Европы (показывается в евро, не списывается)</label>
         <div className="flex items-center gap-2">
           <input value={eur} onChange={(e) => setEur(e.target.value)} className="input !w-32" inputMode="decimal" data-testid="price-eur" />
           <span className="text-slate-400">€ / 100 дней</span>
         </div>
       </div>
       <div>
-        <label className="label">Ориентир в рублях (для показа RU-пользователям)</label>
+        <label className="label">Цена в рублях (ЭТО списывается через Robokassa)</label>
         <div className="flex items-center gap-2">
           <input value={rub} onChange={(e) => setRub(e.target.value)} className="input !w-32" inputMode="numeric" data-testid="price-rub" />
           <span className="text-slate-400">₽</span>
         </div>
       </div>
       <div>
-        <label className="label">Ориентир в драмах (для показа HY-пользователям)</label>
+        <label className="label">Цена для Армении (показывается в драмах, не списывается)</label>
         <div className="flex items-center gap-2">
           <input value={amd} onChange={(e) => setAmd(e.target.value)} className="input !w-32" inputMode="numeric" data-testid="price-amd" />
           <span className="text-slate-400">֏</span>
