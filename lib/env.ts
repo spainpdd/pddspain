@@ -50,6 +50,23 @@ export const env = {
   get stripeWebhookSecret() {
     return process.env.STRIPE_WEBHOOK_SECRET || '';
   },
+  /** Robokassa: логин магазина и пароли (боевые и тестовые) — только в настройках Vercel */
+  get robokassaLogin() {
+    return process.env.ROBOKASSA_LOGIN || '';
+  },
+  get robokassaTest() {
+    return bool(process.env.ROBOKASSA_TEST, false);
+  },
+  get robokassaPass1() {
+    return (this.robokassaTest ? process.env.ROBOKASSA_TEST_PASS1 : process.env.ROBOKASSA_PASS1) || '';
+  },
+  get robokassaPass2() {
+    return (this.robokassaTest ? process.env.ROBOKASSA_TEST_PASS2 : process.env.ROBOKASSA_PASS2) || '';
+  },
+  /** md5 | sha1 | sha256 | sha384 | sha512 — как в техническом разделе кабинета Robokassa */
+  get robokassaHash() {
+    return process.env.ROBOKASSA_HASH || 'md5';
+  },
   get cronSecret() {
     return process.env.CRON_SECRET || '';
   },

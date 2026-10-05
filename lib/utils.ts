@@ -1,8 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { Content, Lang, PlayerQuestion } from './types';
-import type { TransLang } from './types';
 import type { Pricing } from './repo/config';
+import { formatMoney, type ShowCurrency } from './currency';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,12 +18,9 @@ export function formatDate(iso: string | null | undefined) {
   return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Madrid' });
 }
 
-/** Цена для отображения: евро + ориентир в рублях/драмах для ru/hy (оплата всё равно в евро) */
-export function formatPrice(p: Pricing, transLang?: TransLang | null): string {
-  const eur = `${Math.round(p.eur_cents / 100)} €`;
-  if (transLang === 'ru') return `${eur} (≈ ${p.rub.toLocaleString('ru-RU')} ₽)`;
-  if (transLang === 'hy') return `${eur} (≈ ${p.amd.toLocaleString('ru-RU')} ֏)`;
-  return eur;
+/** Цена для отображения в выбранной валюте (см. lib/currency.ts) */
+export function formatPrice(p: Pricing, cur: ShowCurrency = 'EUR'): string {
+  return formatMoney(p, cur);
 }
 
 export function plural(n: number, one: string, few: string, many: string) {

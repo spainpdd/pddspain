@@ -4,6 +4,7 @@ import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
 import { listTests } from '@/lib/repo/content';
 import { getPricing } from '@/lib/repo/config';
+import { getDisplayCurrency } from '@/lib/site-currency';
 import { TEST_COUNT, currentTest, canOpenTest, readinessPercent } from '@/lib/engine';
 import InstallHint from '@/components/InstallHint';
 import StatsModal from '@/components/StatsModal';
@@ -20,7 +21,7 @@ export default async function DashboardPage() {
   const cur = currentTest(tests);
   const curAllowed = cur ? canOpenTest('official', cur, acc) : true;
   const readiness = readinessPercent(passed, total);
-  const priceText = formatPrice(pricing, user.trans_lang);
+  const priceText = formatPrice(pricing, getDisplayCurrency(user.trans_lang));
 
   return (
     <div>

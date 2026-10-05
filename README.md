@@ -144,3 +144,14 @@ npm run questions:import -- data/dgt-official.json  # тесты №1–3 (3 э�
 - Баннер cookie (`components/CookieBanner.tsx`, ru/hy) — информационный: ставим только технические cookie, согласие не требуется. Выбор запоминается в localStorage (`cookie_notice`). Если подключите аналитику/пиксели — нужен баннер с реальным выбором.
 - Перед оплатой две галочки: оферта + немедленный доступ, и отдельно согласие на ПД (`consent` и `privacy` в `/api/stripe/checkout`; время согласия пишется в `payments.consent_at`).
 - На странице входа — строка со ссылками на политику и согласие.
+
+
+## Оплата через Robokassa (самозанятый РФ)
+
+- Списание всегда в **рублях** (`app_config.pricing.rub`, редактируется в `/admin/pricing`). Цена на сайте показывается в валюте страны посетителя: Армения → драмы, РФ/Беларусь/Казахстан → рубли, остальной мир → евро (`lib/currency.ts`, страна по заголовку `x-vercel-ip-country`). В евро и драмах это пересчёт: под ценой на странице оплаты показывается пояснение про рубли.
+- Поток: `/pay` → `POST /api/pay/robokassa` (две галочки; создаёт счёт `robokassa_invoices`, возвращает ссылку на `auth.robokassa.ru`) → оплата → Robokassa вызывает `ResultURL` `/api/robokassa/result` (подпись паролем №2, сверка суммы, выдача 100 дней, ответ `OK<InvId>`; повторы безопасны) → покупатель возвращается на `/pay/success` (показывает реальное состояние доступа) или `/pay/fail`.
+- Применить миграцию `supabase/migrations/005_robokassa_invoices.sql` (Supabase → SQL Editor).
+- Переменные Vercel (пароли вносите только вы): `ROBOKASSA_LOGIN`, `ROBOKASSA_PASS1`, `ROBOKASSA_PASS2`, `ROBOKASSA_TEST_PASS1`, `ROBOKASSA_TEST_PASS2` (отдельные пароли тестового режима), `ROBOKASSA_TEST=1` (тестовый режим, `IsTest=1`), `ROBOKASSA_HASH` (`md5`/`sha256`… — как в кабинете).
+- Кабинет Robokassa → Технические настройки: Result URL `https://pravaes.app/api/robokassa/result`, Success URL `https://pravaes.app/pay/success`, Fail URL `https://pravaes.app/pay/fail`, метод для всех — GET (ResultURL понимает и POST), алгоритм хеша тот же, что в `ROBOKASSA_HASH`.
+- Чек самозанятого (параметр `Receipt`) пока не передаётся: нужно проверить в тестовом режиме, формирует ли «Мой налог»/Робочеки чек сам.
+- Stripe: код остаётся в репозитории, но со страницы оплаты отключён.

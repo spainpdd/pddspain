@@ -10,6 +10,8 @@ const DEFAULT_PHONE = '+7 928 144-48-51';
 export const SELLER_NAME = 'Катанян Гарник Гургенович';
 export const SELLER_STATUS = 'самозанятый (плательщик налога на профессиональный доход)';
 export const SERVICE_NAME = 'DGT Права';
+/** Адрес сайта для юридических текстов (не зависит от настроек окружения) */
+export const LEGAL_SITE_URL = 'https://pravaes.app';
 export const LEGAL_DATE = '5 октября 2026 г.';
 
 export function sellerInn(): string {
