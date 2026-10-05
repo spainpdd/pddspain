@@ -17,6 +17,22 @@ import { isChoice } from './engine';
 const HELP =
   'Команды:\n/question — вопрос дня\n/stats — твои результаты\n/stop — отключить рассылку\n/start — включить рассылку';
 
+/** Первое сообщение после /start: коротко, что внутри, и кнопка открытия приложения */
+export function welcomeText(firstName: string): string {
+  return [
+    `Привет, ${esc(firstName)}! 👋`,
+    '<b>DGT Права</b> — подготовка к теории DGT на русском.',
+    [
+      '✅ Разбор к каждому вопросу и перевод на русский или армянский',
+      '🎯 Закрепление после каждых 10 тестов, чтобы пройденное не забывалось',
+      '🔁 Ошибки возвращаются на повторение, пока вы их не исправите',
+      '🚦 Каждый день здесь же — «вопрос дня»',
+    ].join('\n'),
+    'Нажмите кнопку ниже — откроется приложение с тестами.',
+    HELP,
+  ].join('\n\n');
+}
+
 async function sendQuestionOfDay(tg: TgCall, chatId: number, profile: Profile, prefix = '') {
   const q = await getQuestionOfDay(madridDateKey());
   if (!q) {
@@ -82,7 +98,7 @@ export async function handleUpdate(update: any, tg: TgCall = callTelegram): Prom
     await tg('sendMessage', {
       chat_id: chatId,
       parse_mode: 'HTML',
-      text: `Привет, ${esc(m.from.first_name || '')}! Я присылаю «вопрос дня» и твои результаты по подготовке к экзамену DGT.\n\n${HELP}`,
+      text: welcomeText(m.from.first_name || ''),
       reply_markup: openAppKeyboard('/dashboard'),
     });
     return;

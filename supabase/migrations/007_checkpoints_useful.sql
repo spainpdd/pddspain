@@ -1,4 +1,4 @@
--- 007: повторения в «Ошибках», проверки (закрепление) и раздел «Полезно».
+-- 007: повторения в «Ошибках», проверки (закрепление), раздел «Полезно» и сообщения о проблемах.
 -- Только добавляет: старый код продолжает работать на этой схеме.
 
 -- ------------------------------------------------------------
@@ -60,17 +60,39 @@ create table if not exists public.useful_pages (
 );
 create index if not exists useful_pages_list_idx on public.useful_pages (status, section_id, sort);
 
+-- ------------------------------------------------------------
+-- 4. «Сообщить о проблеме» — обратная связь по вопросам
+-- ------------------------------------------------------------
+create table if not exists public.question_reports (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references public.profiles(id) on delete cascade,
+  question_id  uuid not null references public.questions(id) on delete cascade,
+  reason       text not null check (reason in ('wrong_answer', 'bad_explanation', 'bad_translation', 'bad_image', 'other')),
+  comment      text not null default '',
+  lang         text,                                  -- на каком языке пользователь смотрел вопрос
+  status       text not null default 'new' check (status in ('new', 'resolved')),
+  admin_note   text,
+  resolved_by  uuid references public.profiles(id) on delete set null,
+  resolved_at  timestamptz,
+  created_at   timestamptz not null default now()
+);
+create index if not exists question_reports_list_idx on public.question_reports (status, created_at desc);
+create index if not exists question_reports_question_idx on public.question_reports (question_id);
+-- одна и та же жалоба от одного человека не дублируется, пока не обработана
+create unique index if not exists question_reports_open_uq on public.question_reports (user_id, question_id, reason) where status = 'new';
+
 alter table public.checkpoint_runs  enable row level security;
 alter table public.useful_sections  enable row level security;
 alter table public.useful_pages     enable row level security;
+alter table public.question_reports enable row level security;
 
 do $$
 begin
   if exists (select 1 from pg_roles where rolname = 'anon') then
-    revoke all on public.checkpoint_runs, public.useful_sections, public.useful_pages from anon;
+    revoke all on public.checkpoint_runs, public.useful_sections, public.useful_pages, public.question_reports from anon;
   end if;
   if exists (select 1 from pg_roles where rolname = 'authenticated') then
-    revoke all on public.checkpoint_runs, public.useful_sections, public.useful_pages from authenticated;
+    revoke all on public.checkpoint_runs, public.useful_sections, public.useful_pages, public.question_reports from authenticated;
   end if;
 end
 $$;

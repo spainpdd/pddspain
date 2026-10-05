@@ -29,8 +29,6 @@ export interface LandingText {
   priceCta: string;
   disclaimer: string;
   legal: string;
-  offer: string;
-  privacy: string;
 }
 
 export interface LoginText {
@@ -40,11 +38,9 @@ export interface LoginText {
   noBot: string;
   home: string;
   errGeneric: string;
-  errBlocked: string;
   errBad: string;
   errExpired: string;
   errNoToken: string;
-  agree: { pre: string; privacy: string; and: string; consent: string };
   tg: { signIn: string; waiting: string; notOpened: string; clickHere: string; timeout: string; failed: string; retry: string };
 }
 
@@ -75,9 +71,7 @@ export const LANDING: Record<SiteLang, LandingText> = {
     ],
     priceCta: 'Получить доступ',
     disclaimer: 'Независимый учебный сервис. Не связан с Dirección General de Tráfico (DGT) и не является официальным ресурсом.',
-    legal: 'Условия и источники',
-    offer: 'Оферта',
-    privacy: 'Политика конфиденциальности',
+    legal: 'Условия и конфиденциальность',
   },
   hy: {
     brand: '🚦 DGT Վարորդական',
@@ -105,9 +99,7 @@ export const LANDING: Record<SiteLang, LandingText> = {
     ],
     priceCta: 'Ստանալ հասանելիություն',
     disclaimer: 'Անկախ ուսումնական ծառայություն։ Կապված չէ Dirección General de Tráfico (DGT)-ի հետ և պաշտոնական ռեսուրս չէ։',
-    legal: 'Պայմաններ և աղբյուրներ',
-    offer: 'Օֆերտա',
-    privacy: 'Գաղտնիության քաղաքականություն',
+    legal: 'Պայմաններ և գաղտնիություն',
   },
 };
 
@@ -119,11 +111,9 @@ export const LOGIN: Record<SiteLang, LoginText> = {
     noBot: 'Не задан NEXT_PUBLIC_TELEGRAM_BOT_USERNAME — кнопка Telegram недоступна.',
     home: 'На главную',
     errGeneric: 'Ошибка входа.',
-    errBlocked: 'Аккаунт заблокирован. Если это ошибка, напишите в поддержку.',
     errBad: 'Не удалось проверить вход через Telegram. Попробуйте ещё раз.',
     errExpired: 'Вход устарел. Попробуйте ещё раз.',
     errNoToken: 'Вход через Telegram не настроен на сервере (нет токена бота).',
-    agree: { pre: 'Входя через Telegram, вы соглашаетесь с', privacy: 'политикой конфиденциальности', and: 'и даёте', consent: 'согласие на обработку персональных данных.' },
     tg: {
       signIn: 'Войти через Telegram',
       waiting: 'Ждём подтверждения в Telegram…',
@@ -141,11 +131,9 @@ export const LOGIN: Record<SiteLang, LoginText> = {
     noBot: 'NEXT_PUBLIC_TELEGRAM_BOT_USERNAME-ը նշված չէ. Telegram կոճակը հասանելի չէ։',
     home: 'Գլխավոր էջ',
     errGeneric: 'Մուտքի սխալ։',
-    errBlocked: 'Հաշիվը արգելափակված է։ Եթե դա սխալ է, դիմեք աջակցությանը։',
     errBad: 'Չհաջողվեց ստուգել Telegram-ով մուտքը։ Փորձեք կրկին։',
     errExpired: 'Մուտքի ժամկետը լրացել է։ Փորձեք կրկին։',
     errNoToken: 'Telegram-ով մուտքը սերվերում կարգավորված չէ (բոտի թոքեն չկա)։',
-    agree: { pre: 'Telegram-ով մուտք գործելով՝ դուք համաձայնվում եք', privacy: 'գաղտնիության քաղաքականությանը', and: 'և տալիս եք', consent: 'համաձայնություն անձնական տվյալների մշակման համար։' },
     tg: {
       signIn: 'Մուտք գործել Telegram-ով',
       waiting: 'Սպասում ենք հաստատմանը Telegram-ում…',
@@ -155,25 +143,5 @@ export const LOGIN: Record<SiteLang, LoginText> = {
       failed: 'Չհաջողվեց սկսել մուտքը։ Փորձեք կրկին։',
       retry: 'Փորձել կրկին',
     },
-  },
-};
-
-export interface CookieText {
-  text: string;
-  more: string;
-  ok: string;
-}
-
-/** Уведомление о cookie (баннер внизу экрана) */
-export const COOKIE: Record<SiteLang, CookieText> = {
-  ru: {
-    text: 'Мы используем только технические cookie (вход в аккаунт, язык) и память браузера для сохранения хода теста. На странице оплаты платёжный сервис может использовать свои cookie.',
-    more: 'Политика конфиденциальности',
-    ok: 'Понятно',
-  },
-  hy: {
-    text: 'Մենք օգտագործում ենք միայն տեխնիկական cookie-ներ (հաշիվ մուտք, լեզու) և դիտարկիչի հիշողությունը թեստի ընթացքը պահելու համար։ Վճարման էջում վճարային ծառայությունը կարող է օգտագործել իր cookie-ները։',
-    more: 'Գաղտնիության քաղաքականություն',
-    ok: 'Հասկանալի է',
   },
 };

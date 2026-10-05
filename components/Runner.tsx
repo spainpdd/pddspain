@@ -10,6 +10,7 @@ import type { AnswerMap, Choice, Lang, PlayerQuestion, StudyLang, TransLang } fr
 import { CHOICES, choicesOf } from '@/lib/types';
 import { DGT_SITE, DGT_SOURCE_NAME } from '@/lib/legal-notes';
 import { MAX_ERRORS } from '@/lib/engine';
+import ReportButton from './ReportButton';
 import { cn, pick } from '@/lib/utils';
 
 export interface LangState {
@@ -299,6 +300,7 @@ export default function Runner({ questions, lang, onLang, onFinish, onExit, coun
               {tr?.explanation && <p className="mt-2 text-sm leading-relaxed text-brand-600" data-testid="explanation-tr">{tr.explanation}</p>}
             </div>
           )}
+          {chosen && !blind && <ReportButton key={q.id} questionId={q.id} lang={lang.study} />}
         </div>
       </div>
 

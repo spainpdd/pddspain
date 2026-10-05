@@ -274,3 +274,8 @@ export function madridDateKey(now = new Date()): string {
 export function isChoice(x: unknown): x is Choice {
   return x === 'a' || x === 'b' || x === 'c';
 }
+
+/** Раздел «Полезно» — для оплативших (админам открыт всегда, чтобы проверять материалы) */
+export function canSeeUseful(p: { access_until: string | Date | null; is_admin: boolean }): boolean {
+  return !!p.is_admin || hasPaidAccess(p.access_until);
+}

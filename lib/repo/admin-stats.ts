@@ -164,6 +164,7 @@ export interface AdminOverview {
   no_hy: number;
   tests: number;
   open_claims: number;
+  new_reports: number;
   signups_daily: { d: string; n: number }[];
   answers_daily: { d: string; n: number }[];
   recent_users: { id: string; display_name: string | null; telegram_username: string | null; created_at: string; access_until: string | null }[];
@@ -191,7 +192,8 @@ export async function adminOverview(): Promise<AdminOverview> {
         (select count(*)::int from questions qs where not exists (select 1 from question_translations t where t.question_id = qs.id and t.lang = 'ru')) as no_ru,
         (select count(*)::int from questions qs where not exists (select 1 from question_translations t where t.question_id = qs.id and t.lang = 'hy')) as no_hy,
         (select count(*)::int from tests) as tests,
-        (select count(*)::int from exam_claims where not revoked and result = 'failed') as open_claims`,
+        (select count(*)::int from exam_claims where not revoked and result = 'failed') as open_claims,
+        (select count(*)::int from question_reports where status = 'new') as new_reports`,
     )
   )[0];
   const signups = await db.query(

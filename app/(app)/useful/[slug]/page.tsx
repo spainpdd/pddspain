@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { requireUser } from '@/lib/auth';
+import { canSeeUseful } from '@/lib/engine';
+import UsefulLock from '@/components/useful/UsefulLock';
 import { getPublicPage } from '@/lib/repo/useful';
 import Blocks from '@/components/useful/Blocks';
 
@@ -11,6 +13,7 @@ export const metadata = { title: 'Полезно' };
 
 export default async function UsefulArticlePage({ params }: { params: { slug: string } }) {
   const user = await requireUser();
+  if (!canSeeUseful(user)) return <UsefulLock />;
   const page = await getPublicPage(params.slug, user.trans_lang);
   if (!page) notFound();
 

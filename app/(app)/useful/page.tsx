@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { ChevronRight, Lightbulb } from 'lucide-react';
 import { requireUser } from '@/lib/auth';
+import { canSeeUseful } from '@/lib/engine';
+import UsefulLock from '@/components/useful/UsefulLock';
 import { listPublicUseful } from '@/lib/repo/useful';
 
 export const dynamic = 'force-dynamic';
@@ -8,6 +10,7 @@ export const metadata = { title: 'Полезно' };
 
 export default async function UsefulPage() {
   const user = await requireUser();
+  if (!canSeeUseful(user)) return <UsefulLock />;
   const groups = await listPublicUseful(user.trans_lang);
 
   return (

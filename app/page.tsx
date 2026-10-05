@@ -7,8 +7,6 @@ import { formatPrice } from '@/lib/utils';
 import { getSiteLang } from '@/lib/site-lang';
 import { LANDING } from '@/lib/site-i18n';
 import LangSwitcher from '@/components/LangSwitcher';
-import { sellerLine } from '@/lib/seller';
-import { getDisplayCurrency } from '@/lib/site-currency';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +55,7 @@ export default async function Landing() {
 
         <section id="pricing" className="card mx-auto mt-14 max-w-sm p-8 text-center">
           <div className="text-sm font-medium text-brand-600">{t.priceBadge}</div>
-          <div className="mt-2 text-5xl font-bold" data-testid="landing-price">{formatPrice(pricing, getDisplayCurrency(lang))}</div>
+          <div className="mt-2 text-5xl font-bold" data-testid="landing-price">{formatPrice(pricing, lang)}</div>
           <div className="mt-1 text-slate-500">{t.priceDays}</div>
           <ul className="mt-6 space-y-2 text-left text-sm text-slate-600">
             {t.priceList.map((x) => (
@@ -71,11 +69,6 @@ export default async function Landing() {
       <footer className="mx-auto max-w-3xl px-5 pb-10 text-center text-xs leading-relaxed text-slate-400">
         {t.disclaimer}<br />
         <Link href="/legal" className="underline">{t.legal}</Link>
-        <span className="mx-1.5">·</span>
-        <Link href="/legal/offer" className="underline">{t.offer}</Link>
-        <span className="mx-1.5">·</span>
-        <Link href="/legal/privacy" className="underline">{t.privacy}</Link>
-        <p className="mt-24 text-[9px] leading-snug text-slate-300/80" data-testid="seller-info">{sellerLine()}</p>
       </footer>
     </div>
   );

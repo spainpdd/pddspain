@@ -101,6 +101,7 @@ export default async function AdminHome() {
           <Stat label="Нет перевода HY" value={o.no_hy} href="/admin/questions?missing=hy" />
           <Stat label="Тестов" value={o.tests} href="/admin/tests" />
           <Stat label="Заявок по гарантии «не сдал»" value={o.open_claims} href="/admin/claims" />
+          <Stat label="Новых сообщений о проблемах" value={o.new_reports} href="/admin/reports" tone={o.new_reports ? 'warn' : undefined} />
         </div>
         <div className="card mt-4 p-4 text-sm text-slate-500">
           <p>Пользователям показываются вопросы: активные и со статусом прав <b>own / dgt_official / licensed</b>{env.serveUnverified ? <> и <b className="text-red-700">unverified</b> (включён переключатель)</> : ''}.</p>
