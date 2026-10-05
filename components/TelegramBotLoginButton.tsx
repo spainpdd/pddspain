@@ -20,6 +20,7 @@ export default function TelegramBotLoginButton({ lang = 'ru' }: { lang?: SiteLan
   const [status, setStatus] = useState<Status>('idle');
   const [botUrl, setBotUrl] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tokenRef = useRef<string | null>(null);
   const deadlineRef = useRef<number>(0);
 
   const stopPolling = () => {
@@ -28,39 +29,75 @@ export default function TelegramBotLoginButton({ lang = 'ru' }: { lang?: SiteLan
   };
   useEffect(() => stopPolling, []);
 
+  async function checkOnce() {
+    const token = tokenRef.current;
+    if (!token) return;
+    if (Date.now() > deadlineRef.current) {
+      stopPolling();
+      setStatus('timeout');
+      return;
+    }
+    try {
+      const r = await fetch(`/api/auth/telegram/ticket/${token}`, { cache: 'no-store' });
+      const j = await r.json();
+      if (j.status === 'confirmed') {
+        stopPolling();
+        setStatus('confirmed');
+        window.location.href = '/dashboard';
+      } else if (j.status === 'blocked') {
+        stopPolling();
+        window.location.href = '/login?error=blocked';
+      } else if (j.status === 'expired') {
+        stopPolling();
+        setStatus('timeout');
+      }
+    } catch {
+      // сетевой сбой — молча продолжаем, следующая попытка через POLL_MS
+    }
+  }
+
+  // Вернулись на вкладку (например, из Telegram) — проверяем сразу, не дожидаясь таймера
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && pollRef.current) void checkOnce();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, []);
+
   async function start() {
+    // Окно открываем СРАЗУ, пока жив клик (иначе браузер заблокирует popup после await),
+    // а саму страницу входа не уводим — она должна остаться открытой и ждать подтверждения.
+    const popup = window.open('about:blank', '_blank');
     setStatus('starting');
     try {
       const res = await fetch('/api/auth/telegram/ticket', { method: 'POST' });
       if (!res.ok) throw new Error('ticket');
       const { token, botUrl: url } = await res.json();
       setBotUrl(url);
-      setStatus('waiting');
-      window.location.href = url; // прямой переход — на телефоне открывает приложение Telegram
-
+      tokenRef.current = token;
       deadlineRef.current = Date.now() + TIMEOUT_MS;
-      pollRef.current = setInterval(async () => {
-        if (Date.now() > deadlineRef.current) {
-          stopPolling();
-          setStatus('timeout');
-          return;
-        }
+      setStatus('waiting');
+      stopPolling();
+      pollRef.current = setInterval(checkOnce, POLL_MS);
+
+      if (popup && !popup.closed) {
         try {
-          const r = await fetch(`/api/auth/telegram/ticket/${token}`, { cache: 'no-store' });
-          const j = await r.json();
-          if (j.status === 'confirmed') {
-            stopPolling();
-            setStatus('confirmed');
-            window.location.href = '/dashboard';
-          } else if (j.status === 'expired') {
-            stopPolling();
-            setStatus('timeout');
-          }
-        } catch {
-          // сетевой сбой — молча продолжаем, следующая попытка через POLL_MS
-        }
-      }, POLL_MS);
+          popup.opener = null;
+        } catch {}
+        popup.location.href = url;
+      } else {
+        // popup заблокирован: ссылка «Нажмите сюда» ниже откроет бота в новой вкладке;
+        // на всякий случай пробуем и обычный переход — вход всё равно подтвердится кнопкой в боте
+        window.location.href = url;
+      }
     } catch {
+      popup?.close();
+      stopPolling();
       setStatus('error');
     }
   }
@@ -73,7 +110,7 @@ export default function TelegramBotLoginButton({ lang = 'ru' }: { lang?: SiteLan
         </button>
         <p className="text-xs text-slate-500">
           {t.notOpened}{' '}
-          <a className="underline" href={botUrl ?? '#'}>
+          <a className="underline" href={botUrl ?? '#'} target="_blank" rel="noopener noreferrer">
             {t.clickHere}
           </a>
           .

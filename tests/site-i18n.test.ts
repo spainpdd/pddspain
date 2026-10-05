@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LANDING, LOGIN, langFromAcceptLanguage, normalizeLang } from '../lib/site-i18n';
+import { COOKIE, LANDING, LOGIN, langFromAcceptLanguage, normalizeLang } from '../lib/site-i18n';
 
 describe('язык публичных страниц', () => {
   it('normalizeLang принимает только ru/hy', () => {
@@ -19,9 +19,10 @@ describe('язык публичных страниц', () => {
     expect(LANDING.hy.features).toHaveLength(LANDING.ru.features.length);
     expect(LANDING.hy.priceList).toHaveLength(LANDING.ru.priceList.length);
     expect(Object.keys(LOGIN.hy)).toEqual(Object.keys(LOGIN.ru));
+    expect(Object.keys(COOKIE.hy)).toEqual(Object.keys(COOKIE.ru));
     expect(Object.keys(LOGIN.hy.tg)).toEqual(Object.keys(LOGIN.ru.tg));
     // в армянской версии не должно остаться русских строк
-    const hyText = JSON.stringify([LANDING.hy, LOGIN.hy]);
+    const hyText = JSON.stringify([LANDING.hy, LOGIN.hy, COOKIE.hy]);
     expect(hyText).not.toMatch(/[А-Яа-яЁё]/);
   });
 });
