@@ -41,7 +41,7 @@ export function PricingForm({ pricing }: { pricing: Pricing }) {
         </div>
       </div>
       <div>
-        <label className="label">Цена в рублях (ЭТО списывается через Robokassa)</label>
+        <label className="label">Цена в рублях (ЭТО списывается через Prodamus)</label>
         <div className="flex items-center gap-2">
           <input value={rub} onChange={(e) => setRub(e.target.value)} className="input !w-32" inputMode="numeric" data-testid="price-rub" />
           <span className="text-slate-400">₽</span>

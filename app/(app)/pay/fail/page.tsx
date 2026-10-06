@@ -3,7 +3,7 @@ import { requireUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-/** FailURL Robokassa: платёж не прошёл или отменён */
+/** urlReturn Prodamus: покупатель вернулся без оплаты (отмена или ошибка) */
 export default async function PayFail() {
   await requireUser();
   return (

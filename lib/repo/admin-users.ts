@@ -161,13 +161,13 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
     ),
     db.query(
       `select p.id, p.stripe_session_id as ref, p.amount_cents, p.currency, p.days_granted, p.created_at, i.is_test
-         from payments p left join robokassa_invoices i on p.stripe_session_id = 'rk:' || i.inv_id::text
+         from payments p left join prodamus_orders i on p.stripe_session_id = 'pd:' || i.order_id::text
         where p.user_id = $1 order by p.created_at desc`,
       [id],
     ),
     db.query(
-      `select inv_id, status, is_test, out_sum::float8 as out_sum, shown_currency, shown_amount::float8 as shown_amount, created_at, paid_at
-         from robokassa_invoices where user_id = $1 order by created_at desc limit 100`,
+      `select order_id as inv_id, status, is_test, sum_rub::float8 as out_sum, shown_currency, shown_amount::float8 as shown_amount, created_at, paid_at
+         from prodamus_orders where user_id = $1 order by created_at desc limit 100`,
       [id],
     ),
     db.query(

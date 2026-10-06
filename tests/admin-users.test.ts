@@ -3,7 +3,7 @@ import type { Db } from '../lib/db';
 import { makeDb, seedContent } from './helpers';
 import { upsertTelegramUser } from '../lib/repo/users';
 import { recordPayment } from '../lib/repo/billing';
-import { createInvoice, markInvoicePaid } from '../lib/repo/robokassa';
+import { createOrder, markOrderPaid } from '../lib/repo/prodamus';
 import {
   adminAddNote, adminBlock, adminDeleteNote, adminEndAccess, adminGrantDays, adminSetAccessUntil, adminSetAdmin, adminSetTags,
   getUserDetail, listAudit, listUsersAdmin, normalizeTags, exportUsers, listAllTags,
@@ -169,7 +169,7 @@ describe('карточка пользователя', () => {
     await db.query(`insert into answer_log (user_id, question_id, chosen, correct, context) values ($1,$2,'a',true,'test'), ($1,$2,'b',false,'test')`, [ann.id, ids[0][0]]);
     await db.query(`insert into user_errors (user_id, question_id) values ($1,$2)`, [ann.id, ids[0][0]]);
     await db.query(`insert into test_progress (user_id, test_category, test_number, attempts, best_errors, last_errors, passed, last_attempt_at) values ($1,'official',1,2,1,1,true,now())`, [ann.id]);
-    await recordPayment({ userId: ann.id, sessionId: 'rk:10001', amountCents: 490000, currency: 'rub' });
+    await recordPayment({ userId: ann.id, sessionId: 'pd:10001', amountCents: 490000, currency: 'rub' });
     const d = (await getUserDetail(ann.id))!;
     expect(d.stats).toMatchObject({ answers: 2, correct: 1, accuracy: 50, tests_passed: 1, errors_open: 1, errors_resolved: 0 });
     expect(d.daily).toHaveLength(30);
@@ -183,13 +183,13 @@ describe('карточка пользователя', () => {
 
 describe('платежи и обзор', () => {
   it('выручка не включает тестовые счета; ожидающие считаются отдельно', async () => {
-    const live = await createInvoice({ userId: ann.id, kopecks: 490000, isTest: false, shownCurrency: 'EUR', shownAmount: 49 });
-    await recordPayment({ userId: ann.id, sessionId: `rk:${live}`, amountCents: 490000, currency: 'rub' });
-    await markInvoicePaid(live, {});
-    const test = await createInvoice({ userId: bob.id, kopecks: 490000, isTest: true });
-    await recordPayment({ userId: bob.id, sessionId: `rk:${test}`, amountCents: 490000, currency: 'rub' });
-    await markInvoicePaid(test, {});
-    await createInvoice({ userId: bob.id, kopecks: 490000, isTest: false });
+    const live = await createOrder({ userId: ann.id, kopecks: 490000, isTest: false, shownCurrency: 'EUR', shownAmount: 49 });
+    await recordPayment({ userId: ann.id, sessionId: `pd:${live}`, amountCents: 490000, currency: 'rub' });
+    await markOrderPaid(live, {});
+    const test = await createOrder({ userId: bob.id, kopecks: 490000, isTest: true });
+    await recordPayment({ userId: bob.id, sessionId: `pd:${test}`, amountCents: 490000, currency: 'rub' });
+    await markOrderPaid(test, {});
+    await createOrder({ userId: bob.id, kopecks: 490000, isTest: false });
 
     const o = await paymentsOverview();
     expect(o.rub.total).toBe(4900);

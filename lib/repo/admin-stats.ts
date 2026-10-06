@@ -4,19 +4,19 @@ import { getDb } from '../db';
 
 const iso = (v: unknown) => (v instanceof Date ? v.toISOString() : ((v as string | null) ?? null));
 
-/** Единый список платежей: счета Robokassa + старые платежи Stripe (если были) */
+/** Единый список платежей: заказы Prodamus + платежи без заказа (Stripe, ручные, старые) */
 const PAYMENTS_CTE = `
   x as (
-    select 'robokassa'::text as src, i.inv_id::text as ref, i.user_id, i.status, i.is_test,
-           i.out_sum::float8 as amount, 'RUB'::text as currency,
-           i.shown_currency, i.shown_amount::float8 as shown_amount, i.fee::float8 as fee, i.payment_method,
+    select 'prodamus'::text as src, i.order_id::text as ref, i.user_id, i.status, i.is_test,
+           i.sum_rub::float8 as amount, 'RUB'::text as currency,
+           i.shown_currency, i.shown_amount::float8 as shown_amount, null::float8 as fee, i.payment_method,
            i.created_at, i.paid_at, p.days_granted
-      from robokassa_invoices i left join payments p on p.stripe_session_id = 'rk:' || i.inv_id::text
+      from prodamus_orders i left join payments p on p.stripe_session_id = 'pd:' || i.order_id::text
     union all
     select 'stripe', p.stripe_session_id, p.user_id, 'paid', false,
            (p.amount_cents / 100.0)::float8, upper(p.currency), null, null, null, null,
            p.created_at, p.created_at, p.days_granted
-      from payments p where p.stripe_session_id not like 'rk:%'
+      from payments p where p.stripe_session_id not like 'pd:%'
   )`;
 
 export const PAYMENT_FILTERS = ['all', 'live', 'test', 'pending'] as const;

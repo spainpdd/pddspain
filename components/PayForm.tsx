@@ -12,7 +12,7 @@ export default function PayForm({ configured, priceLabel, testMode }: { configur
   const pay = async () => {
     setBusy(true);
     setErr(null);
-    const res = await fetch('/api/pay/robokassa', {
+    const res = await fetch('/api/pay/prodamus', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ consent, privacy }),

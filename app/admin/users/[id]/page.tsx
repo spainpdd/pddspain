@@ -90,7 +90,7 @@ export default async function UserCard({ params }: { params: { id: string } }) {
                       <td className="p-3 text-xs text-slate-500">{formatDateTime(i.paid_at ?? i.created_at)}</td>
                     </tr>
                   ))}
-                  {d.payments.filter((p) => !p.ref.startsWith('rk:')).map((p) => (
+                  {d.payments.filter((p) => !p.ref.startsWith('pd:')).map((p) => (
                     <tr key={p.id} className="border-t border-slate-200/60">
                       <td className="p-3">Stripe</td><td className="p-3">{formatMoneyCode(p.amount_cents / 100, p.currency.toUpperCase())}</td>
                       <td className="p-3"><Badge tone="green">оплачен</Badge></td><td className="p-3 text-xs text-slate-500">{formatDateTime(p.created_at)}</td>

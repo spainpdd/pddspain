@@ -50,22 +50,29 @@ export const env = {
   get stripeWebhookSecret() {
     return process.env.STRIPE_WEBHOOK_SECRET || '';
   },
-  /** Robokassa: логин магазина и пароли (боевые и тестовые) — только в настройках Vercel */
-  get robokassaLogin() {
-    return process.env.ROBOKASSA_LOGIN || '';
+  /** Prodamus: адрес формы оплаты (не секрет; можно переопределить через PRODAMUS_FORM_URL). Секретные ключи — только в Vercel */
+  get prodamusFormUrl() {
+    return process.env.PRODAMUS_FORM_URL || 'https://pravaes.payform.ru';
   },
-  get robokassaTest() {
-    return bool(process.env.ROBOKASSA_TEST, false);
+  /** Секретный ключ формы (кабинет Prodamus → Настройки → Подпись): подписывает ссылку и вебхук */
+  get prodamusSecret() {
+    return process.env.PRODAMUS_SECRET || '';
   },
-  get robokassaPass1() {
-    return (this.robokassaTest ? process.env.ROBOKASSA_TEST_PASS1 : process.env.ROBOKASSA_PASS1) || '';
+  /** Необязательно: второй ключ для подписи вебхуков (например, сервисный). Проверка принимает любой из двух */
+  get prodamusWebhookSecret() {
+    return process.env.PRODAMUS_WEBHOOK_SECRET || '';
   },
-  get robokassaPass2() {
-    return (this.robokassaTest ? process.env.ROBOKASSA_TEST_PASS2 : process.env.ROBOKASSA_PASS2) || '';
+  /** Необязательно: идентификатор интеграции (sys), если Prodamus его выдал */
+  get prodamusSys() {
+    return process.env.PRODAMUS_SYS || '';
   },
-  /** md5 | sha1 | sha256 | sha384 | sha512 — как в техническом разделе кабинета Robokassa */
-  get robokassaHash() {
-    return process.env.ROBOKASSA_HASH || 'md5';
+  /** Тестовый режим: в ссылку добавляется demo_mode=1, тестовые платежи принимаются и открывают доступ */
+  get prodamusTest() {
+    return bool(process.env.PRODAMUS_TEST, false);
+  },
+  /** Подписывать ссылку на оплату (signature). Выключать только если форма отвергает подпись */
+  get prodamusSignLink() {
+    return bool(process.env.PRODAMUS_SIGN_LINK, true);
   },
   get cronSecret() {
     return process.env.CRON_SECRET || '';

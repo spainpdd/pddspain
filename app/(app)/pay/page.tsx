@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
-import { robokassaConfigured } from '@/lib/robokassa-pay';
+import { prodamusConfigured } from '@/lib/prodamus-pay';
 import { env } from '@/lib/env';
 import { chargeNote } from '@/lib/currency';
 import { getDisplayCurrency } from '@/lib/site-currency';
@@ -36,7 +36,7 @@ export default async function PayPage() {
           ))}
         </ul>
         {acc.paid && <p className="mt-5 text-xs text-slate-500">Сейчас доступ до {formatDate(user.access_until)}; новые 100 дней добавятся к этому сроку.</p>}
-        <div className="mt-6"><PayForm configured={robokassaConfigured()} priceLabel={price} testMode={env.robokassaTest} /></div>
+        <div className="mt-6"><PayForm configured={prodamusConfigured()} priceLabel={price} testMode={env.prodamusTest} /></div>
       </div>
     </div>
   );

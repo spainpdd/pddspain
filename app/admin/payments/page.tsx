@@ -19,7 +19,7 @@ export default async function AdminPayments({ searchParams }: { searchParams: { 
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Платежи и выручка</h1>
-          <p className="mt-1 text-sm text-slate-500">В выручке учитываются только боевые оплаченные счета. Тестовые платежи Robokassa показаны отдельно и в суммы не входят.</p>
+          <p className="mt-1 text-sm text-slate-500">В выручке учитываются только боевые оплаченные счета. Тестовые платежи Prodamus показаны отдельно и в суммы не входят.</p>
         </div>
         <a href={`/api/admin/payments/export${qs({ filter: base.filter })}`} className="btn btn-ghost btn-sm">Скачать CSV</a>
       </div>
@@ -55,7 +55,7 @@ export default async function AdminPayments({ searchParams }: { searchParams: { 
           <tbody>
             {list.rows.map((p) => (
               <tr key={`${p.src}-${p.ref}`} className="border-b border-slate-200/60 hover:bg-slate-50">
-                <td className="p-3">{p.src === 'robokassa' ? `№${p.ref}` : 'Stripe'}{p.is_test && <span className="ml-1"><Badge tone="amber">тест</Badge></span>}</td>
+                <td className="p-3">{p.src === 'prodamus' ? `№${p.ref}` : 'Другое'}{p.is_test && <span className="ml-1"><Badge tone="amber">тест</Badge></span>}</td>
                 <td className="p-3"><UserLink id={p.user_id} name={p.user_name} username={p.telegram_username} /></td>
                 <td className="p-3 font-medium">{formatMoneyCode(p.amount, p.currency)}{p.fee ? <span className="block text-xs font-normal text-slate-400">комиссия {formatMoneyCode(p.fee, p.currency)}</span> : null}</td>
                 <td className="p-3 text-slate-500">{p.shown_currency && p.shown_amount != null && p.shown_currency !== p.currency ? formatMoneyCode(p.shown_amount, p.shown_currency) : '—'}</td>

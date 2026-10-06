@@ -146,12 +146,13 @@ npm run questions:import -- data/dgt-official.json  # тесты №1–3 (3 э�
 - На странице входа — строка со ссылками на политику и согласие.
 
 
-## Оплата через Robokassa (самозанятый РФ)
+## Оплата через Prodamus (самозанятый РФ)
 
 - Списание всегда в **рублях** (`app_config.pricing.rub`, редактируется в `/admin/pricing`). Цена на сайте показывается в валюте страны посетителя: Армения → драмы, РФ/Беларусь/Казахстан → рубли, остальной мир → евро (`lib/currency.ts`, страна по заголовку `x-vercel-ip-country`). В евро и драмах это пересчёт: под ценой на странице оплаты показывается пояснение про рубли.
-- Поток: `/pay` → `POST /api/pay/robokassa` (две галочки; создаёт счёт `robokassa_invoices`, возвращает ссылку на `auth.robokassa.ru`) → оплата → Robokassa вызывает `ResultURL` `/api/robokassa/result` (подпись паролем №2, сверка суммы, выдача 100 дней, ответ `OK<InvId>`; повторы безопасны) → покупатель возвращается на `/pay/success` (показывает реальное состояние доступа) или `/pay/fail`.
-- Применить миграцию `supabase/migrations/005_robokassa_invoices.sql` (Supabase → SQL Editor).
-- Переменные Vercel (пароли вносите только вы): `ROBOKASSA_LOGIN`, `ROBOKASSA_PASS1`, `ROBOKASSA_PASS2`, `ROBOKASSA_TEST_PASS1`, `ROBOKASSA_TEST_PASS2` (отдельные пароли тестового режима), `ROBOKASSA_TEST=1` (тестовый режим, `IsTest=1`), `ROBOKASSA_HASH` (`md5`/`sha256`… — как в кабинете).
-- Кабинет Robokassa → Технические настройки: Result URL `https://pravaes.app/api/robokassa/result`, Success URL `https://pravaes.app/pay/success`, Fail URL `https://pravaes.app/pay/fail`, метод для всех — GET (ResultURL понимает и POST), алгоритм хеша тот же, что в `ROBOKASSA_HASH`.
-- Чек самозанятого (параметр `Receipt`) пока не передаётся: нужно проверить в тестовом режиме, формирует ли «Мой налог»/Робочеки чек сам.
+- Поток: `/pay` → `POST /api/pay/prodamus` (две галочки; создаёт заказ в `prodamus_orders`, возвращает подписанную ссылку на форму `https://<магазин>.payform.ru/?do=pay&…`) → оплата → Prodamus шлёт серверное уведомление на `/api/prodamus/webhook` (подпись в заголовке `Sign`, сверка заказа и суммы, выдача 100 дней, ответ HTTP 200; повторы безопасны) → покупатель возвращается на `/pay/success` (показывает реальное состояние доступа) или `/pay/fail`.
+- Подпись: HMAC-SHA256 от канонического JSON (значения — строки, ключи отсортированы рекурсивно, `/` экранируется как `\/`, кириллица как есть). Реализация — `lib/prodamus.ts`, тесты на эталонных векторах Prodamus — `tests/prodamus.test.ts`.
+- Применить миграцию `supabase/migrations/010_prodamus_orders.sql` (Supabase → SQL Editor). Она же удаляет таблицу прежней платёжной системы.
+- Переменные Vercel (ключи вносите только вы): `PRODAMUS_SECRET` (секретный ключ формы — обязательно), `PRODAMUS_FORM_URL` (необязательно: по умолчанию `https://pravaes.payform.ru`), необязательно `PRODAMUS_WEBHOOK_SECRET` (второй ключ для вебхуков, если Prodamus подписывает ими), `PRODAMUS_SYS`, `PRODAMUS_TEST=1` (тестовый режим: `demo_mode=1`, тестовые платежи открывают доступ), `PRODAMUS_SIGN_LINK=0` (не подписывать ссылку — только если форма её отвергает).
+- Кабинет Prodamus → форма оплаты → настройки: секретный ключ (подпись), «URL для уведомлений» `https://pravaes.app/api/prodamus/webhook` (адрес также передаётся в ссылке), возврат/успех — `https://pravaes.app/pay/fail` и `/pay/success` (также передаются в ссылке).
+- Чек самозанятого формирует Prodamus/«Мой налог» — проверить на тестовом платеже.
 - Stripe: код остаётся в репозитории, но со страницы оплаты отключён.
