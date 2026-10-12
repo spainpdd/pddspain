@@ -12,7 +12,7 @@ export default async function TopicsPage() {
         Переименуйте тему — изменится у всех её вопросов. Если новое имя совпадает с существующей темой, темы объединятся. Пустое имя = «без темы».
         Назначить тему отдельным вопросам можно в редакторе вопроса или массово в списке вопросов.
       </p>
-      <div className="card divide-y divide-slate-800/70">
+      <div className="card divide-y divide-slate-200/70">
         {topics.map((t) => (
           <div key={t.topic ?? '__null'} className="flex flex-wrap items-center justify-between gap-3 p-3" data-testid="topic-row">
             <div className="flex items-center gap-3">

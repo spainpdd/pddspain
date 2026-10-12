@@ -8,18 +8,22 @@ export interface Order {
   is_test: boolean;
   shown_currency: string | null;
   shown_amount: string | null;
+  plan: string;
+  days: number;
   consent_at: string | null;
   created_at: string;
   paid_at: string | null;
 }
 
 const COLS = `order_id::text as order_id, user_id, round(sum_rub * 100)::int as sum_kopecks, status, is_test,
-  shown_currency, shown_amount::text as shown_amount, consent_at, created_at, paid_at`;
+  shown_currency, shown_amount::text as shown_amount, plan, days, consent_at, created_at, paid_at`;
 
 /** Создаёт заказ и возвращает его номер (order_id) */
 export async function createOrder(p: {
   userId: string;
   kopecks: number;
+  plan?: string;
+  days?: number;
   isTest: boolean;
   shownCurrency?: string;
   shownAmount?: number;
@@ -27,9 +31,9 @@ export async function createOrder(p: {
 }): Promise<string> {
   const db = await getDb();
   const rows = await db.query<{ order_id: string }>(
-    `insert into prodamus_orders (user_id, sum_rub, is_test, shown_currency, shown_amount, consent_at)
-     values ($1, $2::numeric / 100, $3, $4, $5, $6) returning order_id::text as order_id`,
-    [p.userId, p.kopecks, p.isTest, p.shownCurrency ?? null, p.shownAmount ?? null, p.consentAt ?? null],
+    `insert into prodamus_orders (user_id, sum_rub, is_test, shown_currency, shown_amount, consent_at, plan, days)
+     values ($1, $2::numeric / 100, $3, $4, $5, $6, $7, $8) returning order_id::text as order_id`,
+    [p.userId, p.kopecks, p.isTest, p.shownCurrency ?? null, p.shownAmount ?? null, p.consentAt ?? null, p.plan ?? 'd100', p.days ?? 100],
   );
   return rows[0].order_id;
 }

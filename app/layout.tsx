@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PwaRegister from '@/components/PwaRegister';
 import CookieBanner from '@/components/CookieBanner';
+import ThemeSync from '@/components/ThemeSync';
+import { applyThemeScript, LIGHT_COLOR } from '@/lib/theme';
 
 export const metadata: Metadata = {
   title: { default: 'DGT Права — подготовка к экзамену', template: '%s · DGT Права' },
@@ -17,14 +19,18 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#eef2f9',
+  themeColor: LIGHT_COLOR,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: applyThemeScript }} />
+      </head>
       <body>
         {children}
+        <ThemeSync />
         <PwaRegister />
         <CookieBanner />
       </body>

@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Languages, ListChecks, RotateCcw, ShieldCheck } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
-import { getPricing } from '@/lib/repo/config';
+import { getPlanPrices } from '@/lib/repo/config';
+import { PLANS, perDayAmount } from '@/lib/plans';
 import { formatPrice } from '@/lib/utils';
 import { getSiteLang } from '@/lib/site-lang';
 import { LANDING } from '@/lib/site-i18n';
@@ -18,7 +19,8 @@ export default async function Landing() {
   if (await getSessionUser()) redirect('/dashboard');
   const lang = getSiteLang();
   const t = LANDING[lang];
-  const pricing = await getPricing();
+  const prices = await getPlanPrices();
+  const cur = getDisplayCurrency(lang);
   return (
     <div className="min-h-dvh" lang={lang}>
       <header className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-5">
@@ -57,8 +59,18 @@ export default async function Landing() {
 
         <section id="pricing" className="card mx-auto mt-14 max-w-sm p-8 text-center">
           <div className="text-sm font-medium text-brand-600">{t.priceBadge}</div>
-          <div className="mt-2 text-5xl font-bold" data-testid="landing-price">{formatPrice(pricing, getDisplayCurrency(lang))}</div>
-          <div className="mt-1 text-slate-500">{t.priceDays}</div>
+          <div className="mt-1 text-sm text-slate-500">{t.priceDays}</div>
+          <div className="mt-5 space-y-2.5" data-testid="landing-plans">
+            {PLANS.map((p, i) => (
+              <div key={p.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-3.5 text-left">
+                <div>
+                  <div className="font-semibold">{t.planTitles[i]}</div>
+                  <div className="text-xs text-slate-500">≈ {perDayAmount(prices[p.id], p.days, cur)} {t.perDay}{p.guarantee ? ` · ${t.withGuarantee}` : ''}</div>
+                </div>
+                <div className="text-xl font-bold" data-testid={`landing-price-${p.id}`}>{formatPrice(prices[p.id], cur)}</div>
+              </div>
+            ))}
+          </div>
           <ul className="mt-6 space-y-2 text-left text-sm text-slate-600">
             {t.priceList.map((x) => (
               <li key={x}>✓ {x}</li>

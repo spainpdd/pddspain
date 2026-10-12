@@ -4,6 +4,54 @@
 
 :root {
   color-scheme: light;
+  /* поверхности */
+  --ink: 238 242 249;      /* #eef2f9 фон страницы */
+  --ink-900: 255 255 255;  /* карточки */
+  --ink-800: 243 246 251;
+  --ink-700: 230 235 243;
+  /* slate: Tailwind по умолчанию */
+  --slate-50: 248 250 252;
+  --slate-100: 241 245 249;
+  --slate-200: 226 232 240;
+  --slate-300: 203 213 225;
+  --slate-400: 148 163 184;
+  --slate-500: 100 116 139;
+  --slate-600: 71 85 105;
+  --slate-700: 51 65 85;
+  --slate-800: 30 41 59;
+  --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
+  --brand-400: 96 165 250;
+  --brand-500: 59 130 246;
+  --brand-600: 37 99 235;
+  --brand-700: 29 78 216;
+  --surface-input: 255 255 255;
+}
+
+/* Тёмная тема: класс .dark ставит скрипт из lib/theme.ts (авто 21:00–07:00, либо выбор в профиле) */
+:root.dark {
+  color-scheme: dark;
+  --ink: 11 18 32;         /* #0b1220 */
+  --ink-900: 18 28 48;     /* карточки */
+  --ink-800: 23 35 56;
+  --ink-700: 30 43 68;
+  /* шкала slate перевёрнута по смыслу: «светлый фон» → тёмный, «тёмный текст» → светлый */
+  --slate-50: 22 32 51;
+  --slate-100: 27 39 64;
+  --slate-200: 42 55 82;
+  --slate-300: 74 90 120;
+  --slate-400: 141 155 181;
+  --slate-500: 163 176 198;
+  --slate-600: 185 195 212;
+  --slate-700: 205 213 226;
+  --slate-800: 226 232 240;
+  --slate-900: 241 245 249;
+  --slate-950: 248 250 252;
+  --brand-400: 147 197 253;
+  --brand-500: 91 156 248;
+  --brand-600: 59 130 246;
+  --brand-700: 138 182 251;
+  --surface-input: 15 24 41;
 }
 
 html,
@@ -15,6 +63,7 @@ body {
 
 body {
   @apply bg-ink text-slate-900 antialiased;
+  transition: background-color 0.2s ease;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Armenian', sans-serif;
 }
 
@@ -38,7 +87,8 @@ body {
     @apply rounded-full px-2.5 py-1 text-xs font-semibold transition;
   }
   .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-500;
+    @apply w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-500;
+    background-color: rgb(var(--surface-input));
   }
   .label {
     @apply mb-1 block text-xs text-slate-500;
@@ -65,3 +115,18 @@ body {
 .rise {
   animation: rise 0.22s ease-out both;
 }
+
+/* ---- Тёмная тема: цветные плашки (подсказки, ошибки, успехи), которые в светлой теме светлые ---- */
+.dark .bg-white { background-color: rgb(var(--ink-900)); }
+.dark .bg-red-50, .dark .bg-red-100 { background-color: rgb(239 68 68 / 0.14); }
+.dark .bg-amber-50, .dark .bg-amber-100 { background-color: rgb(245 158 11 / 0.14); }
+.dark .bg-green-100 { background-color: rgb(34 197 94 / 0.16); }
+.dark .bg-yellow-400\/25 { background-color: rgb(250 204 21 / 0.2); }
+.dark .text-red-700, .dark .text-red-800 { color: rgb(252 165 165); }
+.dark .text-red-600 { color: rgb(248 113 113); }
+.dark .text-amber-700, .dark .text-amber-800, .dark .text-amber-900, .dark .text-amber-950, .dark .text-yellow-800, .dark .text-orange-700 { color: rgb(252 211 77); }
+.dark .text-amber-600 { color: rgb(251 191 36); }
+.dark .text-green-700, .dark .text-green-800, .dark .text-green-950 { color: rgb(134 239 172); }
+.dark .text-green-600 { color: rgb(74 222 128); }
+/* вопросные картинки на белом фоне чуть приглушаем, чтобы не слепили ночью */
+.dark img { filter: brightness(0.9); }

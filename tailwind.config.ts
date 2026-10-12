@@ -1,13 +1,40 @@
 import type { Config } from 'tailwindcss';
 
+/**
+ * Цвета берутся из CSS-переменных (см. app/globals.css): в светлой теме — как раньше, в тёмной (класс .dark на <html>) —
+ * своя палитра. Поэтому слои вроде text-slate-500 или bg-ink-900 сами меняются в зависимости от темы.
+ */
 const config: Config = {
+  darkMode: 'class',
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       colors: {
-        // Светлая, «успокаивающая» тема: мягкий голубовато-серый фон, белые карточки.
-        ink: { DEFAULT: '#eef2f9', 900: '#ffffff', 800: '#f3f6fb', 700: '#e6ebf3' },
-        brand: { 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+        ink: {
+          DEFAULT: 'rgb(var(--ink) / <alpha-value>)',
+          900: 'rgb(var(--ink-900) / <alpha-value>)',
+          800: 'rgb(var(--ink-800) / <alpha-value>)',
+          700: 'rgb(var(--ink-700) / <alpha-value>)',
+        },
+        slate: {
+        50: 'rgb(var(--slate-50) / <alpha-value>)',
+        100: 'rgb(var(--slate-100) / <alpha-value>)',
+        200: 'rgb(var(--slate-200) / <alpha-value>)',
+        300: 'rgb(var(--slate-300) / <alpha-value>)',
+        400: 'rgb(var(--slate-400) / <alpha-value>)',
+        500: 'rgb(var(--slate-500) / <alpha-value>)',
+        600: 'rgb(var(--slate-600) / <alpha-value>)',
+        700: 'rgb(var(--slate-700) / <alpha-value>)',
+        800: 'rgb(var(--slate-800) / <alpha-value>)',
+        900: 'rgb(var(--slate-900) / <alpha-value>)',
+        950: 'rgb(var(--slate-950) / <alpha-value>)',
+        },
+        brand: {
+          400: 'rgb(var(--brand-400) / <alpha-value>)',
+          500: 'rgb(var(--brand-500) / <alpha-value>)',
+          600: 'rgb(var(--brand-600) / <alpha-value>)',
+          700: 'rgb(var(--brand-700) / <alpha-value>)',
+        },
       },
       fontSize: { question: ['1.2rem', { lineHeight: '1.55' }] },
     },

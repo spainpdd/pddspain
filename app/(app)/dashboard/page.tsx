@@ -3,7 +3,8 @@ import { ArrowRight, Lock } from 'lucide-react';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
 import { getCourse } from '@/lib/repo/content';
-import { getPricing } from '@/lib/repo/config';
+import { getPlanPrices } from '@/lib/repo/config';
+import { PLANS, perDayAmount } from '@/lib/plans';
 import { getDisplayCurrency } from '@/lib/site-currency';
 import { TEST_COUNT, currentTest, canOpenTest, canOpenCheckpoint, readinessPercent } from '@/lib/engine';
 import InstallHint from '@/components/InstallHint';
@@ -14,7 +15,7 @@ export const metadata = { title: 'Главная' };
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [stats, course, acc, pricing] = await Promise.all([getStats(user.id), getCourse(user.id), accessInfo(user), getPricing()]);
+  const [stats, course, acc, pricing] = await Promise.all([getStats(user.id), getCourse(user.id), accessInfo(user), getPlanPrices()]);
   const tests = course.tests;
   const passed = tests.filter((t) => t.status === 'passed').length;
   const total = tests.length || TEST_COUNT;
@@ -23,7 +24,9 @@ export default async function DashboardPage() {
   // ближайшая непройденная проверка: когда сданы все тесты до неё — предлагаем её вместо следующего теста
   const check = course.checkpoints.find((c) => c.status === 'available');
   const readiness = readinessPercent(passed, total);
-  const priceText = formatPrice(pricing, getDisplayCurrency(user.trans_lang));
+  const priceCur = getDisplayCurrency(user.trans_lang);
+  const priceText = `от ${formatPrice(pricing.week, priceCur)}`;
+  const perDayText = `≈ ${perDayAmount(pricing.d100, PLANS[2].days, priceCur)} в день при выборе 100 дней`;
 
   return (
     <div>
@@ -107,7 +110,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex items-center justify-between gap-3">
             <p className="text-slate-400">
-              Бесплатно: 1 тест в день (из первых 20). Полный доступ — {priceText} на 100 дней.
+              Бесплатно: 1 тест в день (из первых 20). Полный доступ — {priceText} ({perDayText}).
             </p>
             <Link href="/pay" className="btn btn-primary btn-sm shrink-0">
               Открыть

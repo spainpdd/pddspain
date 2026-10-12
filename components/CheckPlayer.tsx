@@ -231,7 +231,7 @@ export default function CheckPlayer({ runId, milestone, final, tests, minutes, s
           onTimeUp={onTimeUp}
         />
         {askExit && (
-          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" data-testid="check-exit-dialog">
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" data-testid="check-exit-dialog">
             <div className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-8 shadow-2xl sm:rounded-3xl">
               <h2 className="text-lg font-bold">Выйти из проверки?</h2>
               <p className="mt-1 text-sm text-slate-500">Ответы сохранятся, но таймер теста продолжит идти. Набор тестов не изменится.</p>

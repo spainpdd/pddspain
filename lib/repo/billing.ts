@@ -14,6 +14,8 @@ export async function recordPayment(p: {
   currency?: string;
   days?: number;
   consentAt?: Date | null;
+  /** Открывает ли этот платёж гарантию «до сдачи» (по умолчанию да; короткие тарифы — нет) */
+  guarantee?: boolean;
 }): Promise<{ granted: boolean }> {
   const days = p.days ?? ACCESS_DAYS;
   const db = await getDb();
@@ -25,7 +27,7 @@ export async function recordPayment(p: {
       [p.userId, p.sessionId, p.amountCents, p.currency ?? 'eur', days, p.consentAt ?? null],
     );
     if (!ins.length) return { granted: false };
-    await q.query(`update profiles set access_until = ${EXTEND}, guarantee_eligible = true where id = $1`, [p.userId, days]);
+    await q.query(`update profiles set access_until = ${EXTEND}, guarantee_eligible = (guarantee_eligible or $3::boolean) where id = $1`, [p.userId, days, p.guarantee ?? true]);
     return { granted: true };
   });
 }

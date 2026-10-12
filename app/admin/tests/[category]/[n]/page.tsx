@@ -21,7 +21,7 @@ export default async function AdminTest({ params }: { params: { category: string
       <p className="mb-5 text-sm text-slate-400">
         Чтобы заменить вопрос, вставьте ID другого вопроса (его видно в адресе страницы редактирования) и нажмите «Заменить». Один вопрос не может стоять в тесте дважды.
       </p>
-      <div className="card divide-y divide-slate-800/70">
+      <div className="card divide-y divide-slate-200/70">
         {slots.map((s: any) => (
           <div key={s.position} className={cn('flex flex-wrap items-center gap-3 p-3', !s.is_active && 'opacity-60')}>
             <span className="w-7 text-right text-sm text-slate-500">{s.position}</span>

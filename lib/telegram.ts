@@ -51,9 +51,9 @@ export function answerKeyboard(questionId: string, choices: readonly ('a' | 'b' 
 }
 
 /** Кнопка «Открыть приложение» — только если сайт на https (иначе Telegram отклонит) */
-export function openAppKeyboard(path = '/dashboard') {
+export function openAppKeyboard(path = '/dashboard', label = 'Открыть приложение') {
   if (!env.siteUrl.startsWith('https://')) return undefined;
-  return { inline_keyboard: [[{ text: 'Открыть приложение', url: env.siteUrl + path }]] };
+  return { inline_keyboard: [[{ text: label, url: env.siteUrl + path }]] };
 }
 
 export function explanationFor(q: PlayerQuestion, trans: Lang): string | null {

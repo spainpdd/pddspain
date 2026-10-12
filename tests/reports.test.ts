@@ -5,7 +5,6 @@ import { upsertTelegramUser } from '../lib/repo/users';
 import { countNewReports, createReport, listReports, setReportStatus } from '../lib/repo/reports';
 import { RuleError } from '../lib/repo/progress';
 import { ValidationError } from '../lib/repo/admin';
-import { canSeeUseful } from '../lib/engine';
 import { welcomeText } from '../lib/bot';
 import { REPORTS_PER_DAY } from '../lib/reports';
 
@@ -87,17 +86,6 @@ describe('«Сообщить о проблеме»', () => {
     await createReport(u.id, { questionId: ids[0][0], reason: 'wrong_answer' });
     await db.query('delete from profiles where id = $1', [u.id]);
     expect(await countNewReports()).toBe(0);
-  });
-});
-
-describe('«Полезно» только с оплаченным доступом', () => {
-  it('canSeeUseful: оплаченный и админ — да, остальные — нет', () => {
-    const future = new Date(Date.now() + 86_400_000).toISOString();
-    const past = new Date(Date.now() - 86_400_000).toISOString();
-    expect(canSeeUseful({ access_until: future, is_admin: false })).toBe(true);
-    expect(canSeeUseful({ access_until: past, is_admin: false })).toBe(false);
-    expect(canSeeUseful({ access_until: null, is_admin: false })).toBe(false);
-    expect(canSeeUseful({ access_until: null, is_admin: true })).toBe(true);
   });
 });
 

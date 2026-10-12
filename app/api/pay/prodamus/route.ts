@@ -1,6 +1,7 @@
 import { apiUser, fail, json, readJson } from '@/lib/api';
 import { createProdamusPaymentUrl, prodamusConfigured } from '@/lib/prodamus-pay';
 import { getDisplayCurrency } from '@/lib/site-currency';
+import { DEFAULT_PLAN, isPlanId } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,9 +11,11 @@ export async function POST(req: Request) {
   const b = await readJson(req);
   // обе галочки обязательны: оферта + немедленный доступ, и отдельно согласие на обработку ПД
   if (!b?.consent || !b?.privacy) return fail(400, 'consent_required');
+  const plan = b.plan === undefined ? DEFAULT_PLAN : b.plan;
+  if (!isPlanId(plan)) return fail(422, 'bad_plan');
   if (!prodamusConfigured()) return fail(503, 'payments_not_configured');
   try {
-    const url = await createProdamusPaymentUrl(a.user, { shownCurrency: getDisplayCurrency(a.user.trans_lang), consentAt: new Date() });
+    const url = await createProdamusPaymentUrl(a.user, { plan, shownCurrency: getDisplayCurrency(a.user.trans_lang), consentAt: new Date() });
     return json({ url });
   } catch (e: any) {
     if (e?.message === 'too_many') return fail(429, 'too_many_attempts');

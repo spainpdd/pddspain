@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { accessInfo, requireUser } from '@/lib/auth';
 import { getStats } from '@/lib/repo/users';
-import { getPricing } from '@/lib/repo/config';
+import { getPlanPrices } from '@/lib/repo/config';
 import { getDisplayCurrency } from '@/lib/site-currency';
 import { getDb } from '@/lib/db';
 import { ClaimForm, SettingsForm } from '@/components/ProfileForms';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { formatDate, formatPrice, plural } from '@/lib/utils';
 import { GUARANTEE_EXTENSION_DAYS } from '@/lib/engine';
 
@@ -12,7 +13,7 @@ export const metadata = { title: 'Профиль' };
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const [stats, acc, pricing] = await Promise.all([getStats(user.id), accessInfo(user), getPricing()]);
+  const [stats, acc, pricing] = await Promise.all([getStats(user.id), accessInfo(user), getPlanPrices()]);
   const db = await getDb();
   const claims = await db.query(`select to_char(exam_date, 'YYYY-MM-DD') as exam_date, result, days_added, revoked from exam_claims where user_id = $1 order by created_at desc limit 10`, [user.id]);
 
@@ -42,6 +43,11 @@ export default async function ProfilePage() {
       </section>
 
       <section>
+        <h2 className="mb-2 text-sm font-semibold text-slate-400">Тема оформления</h2>
+        <ThemeSwitcher />
+      </section>
+
+      <section>
         <h2 className="mb-2 text-sm font-semibold text-slate-400">Подписка</h2>
         <div className="card space-y-3 p-4 text-sm">
           {acc.paid ? (
@@ -51,7 +57,7 @@ export default async function ProfilePage() {
               {user.access_until ? `Доступ закончился ${formatDate(user.access_until)}.` : 'Подписки нет.'}
             </p>
           )}
-          <Link href="/pay" className="btn btn-primary btn-sm">{acc.paid ? 'Продлить на 100 дней' : `Открыть доступ — ${formatPrice(pricing, getDisplayCurrency(user.trans_lang))}`}</Link>
+          <Link href="/pay" className="btn btn-primary btn-sm">{acc.paid ? 'Продлить доступ' : `Открыть доступ — от ${formatPrice(pricing.week, getDisplayCurrency(user.trans_lang))}`}</Link>
         </div>
       </section>
 

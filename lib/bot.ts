@@ -11,6 +11,7 @@ import { getQuestionOfDay, getQuestionsByIds } from './repo/content';
 import { submitDaily, RuleError } from './repo/progress';
 import { getProfileByTelegramId, getStats, listNotifiable, setNotify, upsertTelegramUser } from './repo/users';
 import { confirmLoginTicket } from './repo/login-tickets';
+import { digestSummary, digestTitle, listDigestPages, listDigestRecipients, logDigest, sentPageIds } from './repo/digest';
 import { choicesOf, type Choice, type Profile } from './types';
 import { isChoice } from './engine';
 
@@ -27,6 +28,7 @@ export function welcomeText(firstName: string): string {
       '🎯 Закрепление после каждых 10 тестов, чтобы пройденное не забывалось',
       '🔁 Ошибки возвращаются на повторение, пока вы их не исправите',
       '🚦 Каждый день здесь же — «вопрос дня»',
+      '📚 Время от времени — полезные материалы: документы, запись на экзамен, права из других стран',
     ].join('\n'),
     'Нажмите кнопку ниже — откроется приложение с тестами.',
     HELP,
@@ -191,6 +193,51 @@ export async function sendDailyBroadcast(tg: TgCall = callTelegram, delayMs = 40
     } catch (e) {
       if (e instanceof TelegramError && e.blocked) {
         await setNotify(u.id, false); // пользователь заблокировал бота — больше не пишем
+        res.blocked++;
+      } else res.failed++;
+    }
+    if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+  }
+  return res;
+}
+
+/** Текст рассылки «Полезно»: заголовок и краткое описание материала + приглашение прочитать в приложении */
+export function usefulDigestText(p: { icon: string | null; title: string; summary: string }): string {
+  return [
+    '📚 <b>Из раздела «Полезно»</b>',
+    `${p.icon ? esc(p.icon) + ' ' : ''}<b>${esc(p.title)}</b>${p.summary ? `\n${esc(p.summary)}` : ''}`,
+    'Откройте материал в приложении — там всё подробно, с шагами и ссылками.',
+  ].join('\n\n');
+}
+
+/**
+ * Рассылка материалов из «Полезно»: каждому, кто не заходил 2+ дня, — первый ещё не присланный ему материал.
+ * Запускается по расписанию 2 раза в неделю (vercel.json). Отключается /stop или переключателем в профиле.
+ */
+export async function sendUsefulDigest(tg: TgCall = callTelegram, delayMs = 40) {
+  const pages = await listDigestPages();
+  const users = pages.length ? await listDigestRecipients() : [];
+  const res = { candidates: users.length, sent: 0, blocked: 0, failed: 0, nothing_new: 0 };
+  for (const u of users) {
+    const seen = await sentPageIds(u.id);
+    const page = pages.find((p) => !seen.has(p.id));
+    if (!page) {
+      res.nothing_new++;
+      continue;
+    }
+    const lang = u.trans_lang === 'hy' ? 'hy' : 'ru';
+    try {
+      await tg('sendMessage', {
+        chat_id: u.telegram_id,
+        parse_mode: 'HTML',
+        text: usefulDigestText({ icon: page.icon, title: digestTitle(page, lang), summary: digestSummary(page, lang) }),
+        reply_markup: openAppKeyboard(`/useful/${page.slug}`, 'Читать в приложении'),
+      });
+      await logDigest(u.id, page.id);
+      res.sent++;
+    } catch (e) {
+      if (e instanceof TelegramError && e.blocked) {
+        await setNotify(u.id, false);
         res.blocked++;
       } else res.failed++;
     }

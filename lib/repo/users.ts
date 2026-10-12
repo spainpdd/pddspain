@@ -166,6 +166,18 @@ export async function setNotify(userId: string, notify: boolean) {
   await db.query('update profiles set notify = $2 where id = $1', [userId, notify]);
 }
 
+/** Сколько ошибок накопилось: повторений (remaining) и разных вопросов (questions) */
+export async function errorTotals(userId: string): Promise<{ remaining: number; questions: number }> {
+  const db = await getDb();
+  const r = (
+    await db.query<{ n: number; k: number }>(
+      'select coalesce(sum(pending), 0)::int as n, count(*)::int as k from user_errors where user_id = $1 and pending > 0',
+      [userId],
+    )
+  )[0];
+  return { remaining: r.n, questions: r.k };
+}
+
 export async function countOpenErrors(userId: string): Promise<number> {
   const db = await getDb();
   return (await db.query('select coalesce(sum(pending), 0)::int as n from user_errors where user_id = $1 and pending > 0', [userId]))[0].n;

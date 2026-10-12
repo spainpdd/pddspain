@@ -30,7 +30,7 @@ export default function PayStatus({ initiallyPaid }: { initiallyPaid: boolean })
     </>
   ) : (
     <>
-      <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-slate-700 border-t-brand-500" />
+      <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-brand-500" />
       <h1 className="mt-4 text-xl font-bold">Подтверждаем оплату…</h1>
       <p className="mt-2 text-sm text-slate-400">Обычно это занимает несколько секунд. Если доступ не появился в течение минуты — напишите нам.</p>
     </>

@@ -55,7 +55,7 @@ export default function ReportButton({ questionId, lang }: { questionId: string;
       </div>
 
       {(phase === 'open' || phase === 'sending') && (
-        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="report-title" data-testid="report-dialog">
+        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="report-title" data-testid="report-dialog">
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-safe shadow-xl sm:rounded-3xl">
             <h2 id="report-title" className="text-lg font-bold">Сообщить о проблеме</h2>
             <label className="mt-4 block text-sm text-slate-500" htmlFor="report-reason">Причина</label>

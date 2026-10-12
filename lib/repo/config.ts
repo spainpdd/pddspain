@@ -1,5 +1,6 @@
 import { getDb } from '../db';
 import { PRICE_CENTS } from '../engine';
+import { DEFAULT_SHORT_PRICES, type PlanId } from '../plans';
 
 /**
  * Цены полного доступа. Хранятся в app_config (key='pricing'), редактируются из админки.
@@ -43,6 +44,42 @@ export async function setPricing(p: Partial<Pricing>): Promise<Pricing> {
     `insert into app_config (key, value, updated_at) values ('pricing', $1::jsonb, now())
      on conflict (key) do update set value = excluded.value, updated_at = now()`,
     [JSON.stringify(next)],
+  );
+  return next;
+}
+
+/** Цены всех тарифов. 100 дней — основная запись 'pricing', короткие — 'pricing_plans' */
+export async function getPlanPrices(): Promise<Record<PlanId, Pricing>> {
+  const db = await getDb();
+  const rows = await db.query<{ value: Partial<Record<'week' | 'm2', Partial<Pricing>>> }>(`select value from app_config where key = 'pricing_plans'`);
+  const v = rows[0]?.value ?? {};
+  const one = (id: 'week' | 'm2'): Pricing => ({
+    eur_cents: clampInt(v[id]?.eur_cents, DEFAULT_SHORT_PRICES[id].eur_cents),
+    rub: clampInt(v[id]?.rub, DEFAULT_SHORT_PRICES[id].rub),
+    amd: clampInt(v[id]?.amd, DEFAULT_SHORT_PRICES[id].amd),
+  });
+  return { week: one('week'), m2: one('m2'), d100: await getPricing() };
+}
+
+export async function getPlanPrice(plan: PlanId): Promise<Pricing> {
+  return (await getPlanPrices())[plan];
+}
+
+export async function setPlanPrice(plan: PlanId, p: Partial<Pricing>): Promise<Pricing> {
+  if (plan === 'd100') return setPricing(p);
+  const current = (await getPlanPrices())[plan];
+  const next: Pricing = {
+    eur_cents: p.eur_cents !== undefined ? clampInt(p.eur_cents, current.eur_cents) : current.eur_cents,
+    rub: p.rub !== undefined ? clampInt(p.rub, current.rub) : current.rub,
+    amd: p.amd !== undefined ? clampInt(p.amd, current.amd) : current.amd,
+  };
+  const db = await getDb();
+  const rows = await db.query<{ value: Record<string, unknown> }>(`select value from app_config where key = 'pricing_plans'`);
+  const merged = { ...(rows[0]?.value ?? {}), [plan]: next };
+  await db.query(
+    `insert into app_config (key, value, updated_at) values ('pricing_plans', $1::jsonb, now())
+     on conflict (key) do update set value = excluded.value, updated_at = now()`,
+    [JSON.stringify(merged)],
   );
   return next;
 }

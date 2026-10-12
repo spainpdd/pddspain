@@ -158,7 +158,7 @@ export default function TestPlayer({ mode, category, testNumber, questions, sett
         />
         {phase === 'submitting' && <Overlay>Проверяем результат…</Overlay>}
         {askExit && phase === 'play' && (
-          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" data-testid="exit-dialog">
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" data-testid="exit-dialog">
             <div className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-8 shadow-2xl sm:rounded-3xl">
               <h2 className="text-lg font-bold">Выйти из теста?</h2>
               <p className="mt-1 text-sm text-slate-500">Что сделать с вашими ответами в этом тесте?</p>
@@ -274,5 +274,5 @@ function Actions({ children }: { children: React.ReactNode }) {
   return <div className="mt-8 w-full max-w-xs space-y-3">{children}</div>;
 }
 function Overlay({ children }: { children: React.ReactNode }) {
-  return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/70 text-white backdrop-blur-sm">{children}</div>;
+  return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 text-white backdrop-blur-sm">{children}</div>;
 }

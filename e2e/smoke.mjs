@@ -58,7 +58,7 @@ try {
   console.log('Лендинг и вход');
   await page.goto(BASE + '/');
   ok(await page.getByText('Сдайте теорию DGT').isVisible(), 'лендинг открывается');
-  ok(await page.getByText('50 €').first().isVisible(), 'на лендинге виден тариф');
+  ok(await page.getByTestId('landing-plans').isVisible() && (await page.getByTestId('landing-price-week').textContent()).includes('10 €') && (await page.getByTestId('landing-price-d100').textContent()).includes('49 €'), 'на лендинге видны три тарифа');
   await shot(page, '01-landing');
   await page.goto(BASE + '/dashboard');
   ok(page.url().endsWith('/login'), 'без входа /dashboard перекидывает на /login');
@@ -156,7 +156,7 @@ try {
   ok(await page.getByTestId('pay-btn').isDisabled(), 'кнопка оплаты неактивна без согласия');
   await shot(page, '10-pay');
   await page.goto(BASE + '/errors');
-  ok(await page.getByText('Раздел ошибок доступен с подпиской').isVisible(), '«Ошибки» закрыты без подписки');
+  ok(await page.getByTestId('errors-locked').isVisible(), '«Ошибки» закрыты без подписки, но показывают накопленные ошибки');
 
   console.log('Админка: выдача доступа');
   await page.goto(BASE + '/admin/users');

@@ -1,8 +1,8 @@
 import 'server-only';
 import { env } from './env';
-import { ACCESS_DAYS } from './engine';
 import { SERVICE_NAME } from './seller';
-import { getPricing } from './repo/config';
+import { getPlanPrice } from './repo/config';
+import { getPlan, type PlanId } from './plans';
 import { getProfile } from './repo/users';
 import { recordPayment } from './repo/billing';
 import { countRecentPendingOrders, createOrder, getOrder, markOrderPaid } from './repo/prodamus';
@@ -16,15 +16,19 @@ export const prodamusConfigured = () => !!(normalizeFormUrl(env.prodamusFormUrl)
 const MAX_PENDING_PER_HOUR = 10;
 
 /** Создаёт заказ и возвращает ссылку на форму оплаты Prodamus. Списание всегда в рублях. */
-export async function createProdamusPaymentUrl(user: Profile, opts: { shownCurrency: ShowCurrency; consentAt: Date }): Promise<string> {
+export async function createProdamusPaymentUrl(user: Profile, opts: { plan: PlanId; shownCurrency: ShowCurrency; consentAt: Date }): Promise<string> {
   const formUrl = normalizeFormUrl(env.prodamusFormUrl);
   if (!formUrl || !env.prodamusSecret) throw new Error('not_configured');
   if ((await countRecentPendingOrders(user.id)) >= MAX_PENDING_PER_HOUR) throw new Error('too_many');
-  const pricing = await getPricing();
+  const plan = getPlan(opts.plan);
+  if (!plan) throw new Error('bad_plan');
+  const pricing = await getPlanPrice(plan.id);
   const kopecks = pricing.rub * 100;
   const orderId = await createOrder({
     userId: user.id,
     kopecks,
+    plan: plan.id,
+    days: plan.days,
     isTest: env.prodamusTest,
     shownCurrency: opts.shownCurrency,
     shownAmount: shownAmount(pricing, opts.shownCurrency),
@@ -33,7 +37,7 @@ export async function createProdamusPaymentUrl(user: Profile, opts: { shownCurre
   const params: Record<string, unknown> = {
     do: 'pay',
     order_id: orderId,
-    products: [{ name: `${SERVICE_NAME} доступ на ${ACCESS_DAYS} дней`.slice(0, 128), price: formatRub(kopecks), quantity: '1' }],
+    products: [{ name: `${SERVICE_NAME} доступ на ${plan.days} дней`.slice(0, 128), price: formatRub(kopecks), quantity: '1' }],
     urlReturn: `${env.siteUrl}/pay/fail`,
     urlSuccess: `${env.siteUrl}/pay/success`,
     urlNotification: `${env.siteUrl}/api/prodamus/webhook`,
@@ -83,6 +87,8 @@ export async function processProdamusWebhook(
     sessionId: `pd:${order.order_id}`,
     amountCents: order.sum_kopecks,
     currency: 'rub',
+    days: order.days,
+    guarantee: getPlan(order.plan)?.guarantee ?? false,
     consentAt: order.consent_at ? new Date(order.consent_at) : null,
   });
   await markOrderPaid(order.order_id, {

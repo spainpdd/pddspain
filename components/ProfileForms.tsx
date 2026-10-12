@@ -39,7 +39,7 @@ export function SettingsForm(props: { study: StudyLang; trans: TransLang; auto: 
         </div>
       </div>
       <Toggle label="Показывать перевод сразу" checked={s.auto} onChange={(v) => update({ auto: v })} />
-      <Toggle label="«Вопрос дня» в Telegram" checked={s.notify} onChange={(v) => update({ notify: v })} />
+      <Toggle label="«Вопрос дня» и полезные материалы в Telegram" checked={s.notify} onChange={(v) => update({ notify: v })} />
       <p className="h-4 text-xs text-slate-500">{saved ? 'Сохранено' : ''}</p>
     </div>
   );
