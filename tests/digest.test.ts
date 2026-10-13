@@ -116,6 +116,9 @@ describe('рассылка «Полезно» в бот', () => {
     expect(byChat[hyUser.telegram_id]).toContain('Տեղեկանք');
     expect(byChat[ruUser.telegram_id]).toContain('Справка &lt;b&gt;');
     expect(usefulDigestText({ icon: null, title: 'T', summary: '' })).not.toContain('undefined');
+    expect(usefulDigestText({ icon: '🆕', title: 'T', summary: 'S' })).toBe(
+      '📚 <b>Из раздела «Полезно»</b>\n\n🆕 <b>T</b>\n\nS\n\n<i>Откройте материал в приложении — там всё подробно, с шагами и ссылками.</i>',
+    );
   });
 
   it('отключившие рассылку (/stop) и заблокированные не получают; блокировка бота выключает рассылку', async () => {

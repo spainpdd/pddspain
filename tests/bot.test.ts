@@ -63,8 +63,8 @@ describe('бот', () => {
     calls.length = 0;
     await handleUpdate(msg(5552, '/question'), tg);
     const p = calls[0].payload;
-    expect(p.text).toContain('ES');
-    expect(p.text).toContain('RU');
+    expect(p.text).toContain('🇪🇸 Español');
+    expect(p.text).toContain('🇷🇺 Русский');
     expect(p.text).toContain('Вопрос RU');
     expect(p.reply_markup.inline_keyboard[0].map((b: any) => b.text)).toEqual(['A', 'B', 'C']);
     expect(p.reply_markup.inline_keyboard[0][0].callback_data).toMatch(/^d:[0-9a-f-]{36}:a$/);
