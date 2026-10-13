@@ -16,7 +16,7 @@ import { choicesOf, type Choice, type Profile } from './types';
 import { isChoice } from './engine';
 
 const HELP =
-  'Команды:\n/question — вопрос дня\n/stats — твои результаты\n/stop — отключить рассылку\n/start — включить рассылку';
+  'Команды:\n🎯 /question — вопрос дня\n📊 /stats — твои результаты\n🔕 /stop — отключить рассылку\n🔔 /start — включить рассылку';
 
 /** Первое сообщение после /start: коротко, что внутри, и кнопка открытия приложения */
 export function welcomeText(firstName: string): string {
@@ -205,8 +205,8 @@ export async function sendDailyBroadcast(tg: TgCall = callTelegram, delayMs = 40
 export function usefulDigestText(p: { icon: string | null; title: string; summary: string }): string {
   return [
     '📚 <b>Из раздела «Полезно»</b>',
-    `${p.icon ? esc(p.icon) + ' ' : ''}<b>${esc(p.title)}</b>${p.summary ? `\n${esc(p.summary)}` : ''}`,
-    'Откройте материал в приложении — там всё подробно, с шагами и ссылками.',
+    `${p.icon ? esc(p.icon) + ' ' : ''}<b>${esc(p.title)}</b>${p.summary ? `\n\n${esc(p.summary)}` : ''}`,
+    '<i>Откройте материал в приложении — там всё подробно, с шагами и ссылками.</i>',
   ].join('\n\n');
 }
 
